@@ -23,8 +23,6 @@ class Discount extends Model
         'min_purchase',
         'is_active',
         'is_accumulative',
-        'created_at',
-        'updated_at'
     ];
 
     protected $casts = [
@@ -35,6 +33,8 @@ class Discount extends Model
         'is_accumulative' => 'boolean',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function supplier()

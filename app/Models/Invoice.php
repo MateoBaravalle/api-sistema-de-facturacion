@@ -17,8 +17,6 @@ class Invoice extends Model
         'discount',
         'total',
         'status',
-        'created_at',
-        'updated_at'
     ];
 
     protected $casts = [
@@ -27,6 +25,8 @@ class Invoice extends Model
         'discount' => 'decimal:2',
         'total' => 'decimal:2',
         'status' => 'string',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function client()

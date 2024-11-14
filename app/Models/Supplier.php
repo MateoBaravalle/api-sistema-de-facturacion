@@ -21,14 +21,14 @@ class Supplier extends Model
         'payment_terms',
         'balance',
         'status',
-        'created_at',
-        'updated_at'
     ];
 
     protected $casts = [
         'payment_terms' => 'integer',
         'balance' => 'decimal:2',
         'status' => 'string',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 

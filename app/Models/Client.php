@@ -22,14 +22,14 @@ class Client extends Model
         'credit_limit',
         'balance',
         'status',
-        'created_at',
-        'updated_at'
     ];
 
     protected $casts = [
         'credit_limit' => 'decimal:2',
         'balance' => 'decimal:2',
         'status' => 'string',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
     

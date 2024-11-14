@@ -17,8 +17,6 @@ class Transaction extends Model
         'status',
         'transaction_date',
         'due_date',
-        'created_at',
-        'updated_at'
     ];
 
     protected $casts = [
@@ -26,6 +24,8 @@ class Transaction extends Model
         'status' => 'string',
         'transaction_date' => 'datetime',
         'due_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function reference()

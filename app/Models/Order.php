@@ -18,8 +18,6 @@ class Order extends Model
         'discount',
         'total_amount',
         'notes',
-        'created_at',
-        'updated_at'
     ];
 
     protected $casts = [
@@ -27,6 +25,8 @@ class Order extends Model
         'discount' => 'float',
         'total_amount' => 'decimal:2',
         'status' => 'string',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function reference()

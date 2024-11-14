@@ -21,6 +21,8 @@ class Notification extends Model
         'importance' => 'string',
         'notification_type' => 'string',
         'is_read' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function user()

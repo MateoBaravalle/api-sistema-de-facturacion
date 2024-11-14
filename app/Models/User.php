@@ -3,21 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
 
-class User extends Model
+class User extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     protected $fillable = [
+        'username',
         'name',
+        'lastname',
         'email',
         'password',
         'phone',
-        'created_at',
-        'updated_at'
     ];
 
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    // Relationships
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_role');
@@ -26,5 +38,40 @@ class User extends Model
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+
+    // Mutators/Accessors
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = strtolower($value);
+    }
+
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::make($value);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->name} {$this->lastname}";
+    }
+
+
+    // Helper methods
+    public function hasAnyRole($roles)
+    {
+        if (is_array($roles)) {
+            return $this->roles->whereIn('name', $roles)->count() > 0;
+        }
+        return $this->hasRole($roles);
+    }
+
+    public function hasAllRoles($roles)
+    {
+        if (is_array($roles)) {
+            return $this->roles->whereIn('name', $roles)->count() === count($roles);
+        }
+        return $this->hasRole($roles);
     }
 }

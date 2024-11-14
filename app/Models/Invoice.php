@@ -21,6 +21,14 @@ class Invoice extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'date' => 'datetime',
+        'subtotal' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'total' => 'decimal:2',
+        'status' => 'string',
+    ];
+
     public function client()
     {
         return $this->belongsTo(Client::class);

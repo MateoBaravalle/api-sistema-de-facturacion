@@ -19,6 +19,13 @@ class Product extends Model
         'status'
     ];
 
+    protected $casts = [
+        'purchase_price' => 'decimal:2',
+        'sale_price' => 'decimal:2',
+        'stock' => 'integer',
+        'status' => 'string',
+    ];
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);
@@ -26,7 +33,9 @@ class Product extends Model
 
     public function orders()
     {
-        return $this->belongsToMany(Order::class)->using(OrderProduct::class);
+        return $this->belongsToMany(Order::class)
+            ->using(OrderProduct::class)
+            ->withPivot(['quantity', 'price', 'discount']);
     }
 
     public function price_history()

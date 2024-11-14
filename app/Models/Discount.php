@@ -27,6 +27,16 @@ class Discount extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'percentage' => 'float',
+        'fixed_amount' => 'decimal:2',
+        'min_purchase' => 'decimal:2',
+        'is_active' => 'boolean',
+        'is_accumulative' => 'boolean',
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
+    ];
+
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);

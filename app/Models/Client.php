@@ -25,6 +25,13 @@ class Client extends Model
         'created_at',
         'updated_at'
     ];
+
+    protected $casts = [
+        'credit_limit' => 'decimal:2',
+        'balance' => 'decimal:2',
+        'status' => 'string',
+        'deleted_at' => 'datetime',
+    ];
     
     public function transactions(): MorphMany
     {

@@ -22,6 +22,13 @@ class Order extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'order_date' => 'datetime',
+        'discount' => 'float',
+        'total_amount' => 'decimal:2',
+        'status' => 'string',
+    ];
+
     public function reference()
     {
         return $this->morphTo();
@@ -29,7 +36,9 @@ class Order extends Model
 
     public function products()
     {
-        return $this->belongsToMany(Product::class)->using(OrderProduct::class);
+        return $this->belongsToMany(Product::class)
+            ->using(OrderProduct::class)
+            ->withPivot(['quantity', 'price', 'discount']);
     }
 
     public function invoice()

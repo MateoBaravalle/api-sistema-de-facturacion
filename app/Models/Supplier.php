@@ -25,6 +25,13 @@ class Supplier extends Model
         'updated_at'
     ];
 
+    protected $casts = [
+        'payment_terms' => 'integer',
+        'balance' => 'decimal:2',
+        'status' => 'string',
+        'deleted_at' => 'datetime',
+    ];
+
     public function transactions()
     {
         return $this->morphMany(Transaction::class, 'reference');

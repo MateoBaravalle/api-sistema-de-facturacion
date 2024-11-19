@@ -4,13 +4,17 @@ namespace App\Services;
 
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Hash;
 
+/**
+ * Authentication service handling user authentication operations
+ * 
+ * This service provides methods for user registration, login, logout and token refresh
+ * using JWT authentication.
+ */
 class AuthService
 {
     public function register(array $data): array
     {
-        $data['password'] = Hash::make($data['password']);
         $user = User::create($data);
         $token = JWTAuth::fromUser($user);
 
@@ -31,11 +35,11 @@ class AuthService
 
     public function logout(string $token): void
     {
-        JWTAuth::invalidate($token);
+        JWTAuth::setToken($token)->invalidate();
     }
 
-    public function refresh(): string
+    public function refresh(string $token): string
     {
-        return JWTAuth::refresh();
+        return JWTAuth::setToken($token)->refresh();
     }
 }

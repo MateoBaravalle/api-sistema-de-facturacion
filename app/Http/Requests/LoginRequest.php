@@ -10,10 +10,8 @@ class LoginRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,10 +19,10 @@ class LoginRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
-     * @param \Illuminate\Contracts\Validation\Validator $validator The validator instance containing the validation errors.
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     * @param Validator $validator The validator instance containing the validation errors.
+     * @throws HttpResponseException
      */
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
             "message" => "Validation failed",
@@ -34,10 +32,8 @@ class LoginRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'email' => 'required|exists:users,email',
@@ -45,7 +41,10 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    public function messages()
+    /**
+     * Get custom messages for validator errors.
+     */
+    public function messages(): array
     {
         return [
             'email.required' => 'The email field is required',

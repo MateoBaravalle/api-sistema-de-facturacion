@@ -11,14 +11,14 @@ use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    protected $authService;
+    protected AuthService $authService;
 
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
     }
 
-    private function successResponse($message, $data = [], $code = 200): JsonResponse
+    private function successResponse(string $message, array $data = [], int $code = 200): JsonResponse
     {
         return response()->json([
             'status' => 'success',
@@ -72,24 +72,18 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         try {
-            $token = $request->bearerToken();
-
-            if (!$token) {
-                return $this->errorResponse('No token provided', null, 401);
-            }
-
-            $this->authService->logout($token);
+            $this->authService->logout($request->bearerToken());
             return $this->successResponse('Successfully logged out');
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
     }
 
-    public function refresh(): JsonResponse
+    public function refresh(Request $request): JsonResponse
     {
         try {
-            $token = $this->authService->refresh();
-            return $this->successResponse('Token refreshed', ['token' => $token]);
+            $newToken = $this->authService->refresh($request->bearerToken());
+            return $this->successResponse('Token refreshed', ['token' => $newToken]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

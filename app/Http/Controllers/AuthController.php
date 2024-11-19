@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\AuthService;
-use App\Http\Requests\RegisterRequest;
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\AuthRequest\RegisterRequest;
+use App\Http\Requests\AuthRequest\LoginRequest;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;

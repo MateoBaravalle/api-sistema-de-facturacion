@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
@@ -41,7 +41,6 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Notification::class);
     }
 
-    
     // Implement the required methods from JWTSubject
     public function getJWTIdentifier()
     {
@@ -68,7 +67,6 @@ class User extends Authenticatable implements JWTSubject
     {
         return "{$this->name} {$this->lastname}";
     }
-
 
     // Helper methods
     public function hasAnyRole($roles)

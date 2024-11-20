@@ -16,7 +16,7 @@ class OrderProduct extends Model
         'product_id',
         'quantity',
         'price',
-        'discount'
+        'discount',
     ];
 
     protected $casts = [

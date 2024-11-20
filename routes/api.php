@@ -21,7 +21,7 @@ Route::group(['middleware' => 'api'], function () {
     Route::group(['middleware' => 'auth:api'], function () {
         Route::get('/logout', [AuthController::class, 'logout']);
         Route::get('/refresh', [AuthController::class, 'refresh']);
-        
+
         // Rutas de Client
         Route::get('/client', [ClientController::class, 'index']);
         Route::post('/client', [ClientController::class, 'store']);

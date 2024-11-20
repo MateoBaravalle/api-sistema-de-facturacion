@@ -1,11 +1,12 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Client extends Model
 {
@@ -32,7 +33,7 @@ class Client extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
-    
+
     public function transactions(): MorphMany
     {
         return $this->morphMany(Transaction::class, 'reference');

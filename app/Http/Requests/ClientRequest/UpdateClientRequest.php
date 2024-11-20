@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\ClientRequest;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateClientRequest extends FormRequest
@@ -16,8 +16,8 @@ class UpdateClientRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
-            "message" => "Validation failed",
-            "error" => $validator->errors(),
+            'message' => 'Validation failed',
+            'error' => $validator->errors(),
         ], 422));
     }
 

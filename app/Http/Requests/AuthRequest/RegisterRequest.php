@@ -6,11 +6,13 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class RegisterRequest extends FormRequest {
+class RegisterRequest extends FormRequest
+{
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool {
+    public function authorize(): bool
+    {
         return true;
     }
 
@@ -19,7 +21,8 @@ class RegisterRequest extends FormRequest {
      *
      * @throws HttpResponseException
      */
-    protected function failedValidation(Validator $validator): never {
+    protected function failedValidation(Validator $validator): never
+    {
         throw new HttpResponseException(response()->json([
             'message' => 'Validation failed',
             'error' => $validator->errors(),
@@ -31,7 +34,8 @@ class RegisterRequest extends FormRequest {
      *
      * @return array<string, string>
      */
-    public function rules(): array {
+    public function rules(): array
+    {
         return [
             'username' => 'required|string|max:255|unique:users,username|regex:/^[a-zA-Z0-9._-]+$/',
             'name' => 'required|string|max:255',
@@ -47,7 +51,8 @@ class RegisterRequest extends FormRequest {
      *
      * @return array<string, string>
      */
-    public function messages(): array {
+    public function messages(): array
+    {
         return [
             'username.required' => 'El nombre de usuario es requerido',
             'username.string' => 'El nombre de usuario debe ser una cadena de texto',

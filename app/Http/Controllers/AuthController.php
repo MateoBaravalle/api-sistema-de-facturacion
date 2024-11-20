@@ -9,17 +9,14 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
-class AuthController extends Controller
-{
+class AuthController extends Controller {
     protected AuthService $authService;
 
-    public function __construct(AuthService $authService)
-    {
+    public function __construct(AuthService $authService) {
         $this->authService = $authService;
     }
 
-    private function successResponse(string $message, array $data = [], int $code = 200): JsonResponse
-    {
+    private function successResponse(string $message, array $data = [], int $code = 200): JsonResponse {
         return response()->json([
             'status' => 'success',
             'message' => $message,
@@ -27,8 +24,7 @@ class AuthController extends Controller
         ], $code);
     }
 
-    private function errorResponse(string $message, ?string $error = null, int $code = 400): JsonResponse
-    {
+    private function errorResponse(string $message, ?string $error = null, int $code = 400): JsonResponse {
         return response()->json([
             'status' => 'error',
             'message' => $message,
@@ -36,16 +32,14 @@ class AuthController extends Controller
         ], $code);
     }
 
-    protected function handleException(\Exception $e): JsonResponse
-    {
+    protected function handleException(\Exception $e): JsonResponse {
         $code = $e instanceof JWTException ? 401 : 500;
         $message = $e instanceof JWTException ? 'Token error' : 'Operation failed';
 
         return $this->errorResponse($message, $e->getMessage(), $code);
     }
 
-    public function register(RegisterRequest $request): JsonResponse
-    {
+    public function register(RegisterRequest $request): JsonResponse {
         try {
             $result = $this->authService->register($request->validated());
 
@@ -59,8 +53,7 @@ class AuthController extends Controller
         }
     }
 
-    public function login(LoginRequest $request): JsonResponse
-    {
+    public function login(LoginRequest $request): JsonResponse {
         try {
             $token = $this->authService->login($request->validated());
             return $this->successResponse('Successfully logged in', ['token' => $token]);
@@ -69,8 +62,7 @@ class AuthController extends Controller
         }
     }
 
-    public function logout(Request $request): JsonResponse
-    {
+    public function logout(Request $request): JsonResponse {
         try {
             $this->authService->logout($request->bearerToken());
             return $this->successResponse('Successfully logged out');
@@ -79,8 +71,7 @@ class AuthController extends Controller
         }
     }
 
-    public function refresh(Request $request): JsonResponse
-    {
+    public function refresh(Request $request): JsonResponse {
         try {
             $newToken = $this->authService->refresh($request->bearerToken());
             return $this->successResponse('Token refreshed', ['token' => $newToken]);

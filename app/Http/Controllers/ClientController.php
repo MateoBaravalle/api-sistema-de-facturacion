@@ -7,17 +7,14 @@ use App\Http\Requests\ClientRequest\StoreClientRequest;
 use App\Http\Requests\ClientRequest\UpdateClientRequest;
 use Illuminate\Http\JsonResponse;
 
-class ClientController extends Controller
-{
+class ClientController extends Controller {
     protected ClientService $clientService;
 
-    public function __construct(ClientService $clientService)
-    {
+    public function __construct(ClientService $clientService) {
         $this->clientService = $clientService;
     }
 
-    private function successResponse(string $message, array $data = [], int $code = 200): JsonResponse
-    {
+    private function successResponse(string $message, array $data = [], int $code = 200): JsonResponse {
         return response()->json([
             'status' => 'success',
             'message' => $message,
@@ -25,8 +22,7 @@ class ClientController extends Controller
         ], $code);
     }
 
-    private function errorResponse(string $message, ?string $error = null, int $code = 400): JsonResponse
-    {
+    private function errorResponse(string $message, ?string $error = null, int $code = 400): JsonResponse {
         return response()->json([
             'status' => 'error',
             'message' => $message,
@@ -34,8 +30,7 @@ class ClientController extends Controller
         ], $code);
     }
 
-    public function index(): JsonResponse
-    {
+    public function index(): JsonResponse {
         try {
             $clients = $this->clientService->getAllClients();
             return $this->successResponse('Clients retrieved successfully', ['clients' => $clients]);
@@ -44,8 +39,7 @@ class ClientController extends Controller
         }
     }
 
-    public function store(StoreClientRequest $request): JsonResponse
-    {
+    public function store(StoreClientRequest $request): JsonResponse {
         try {
             $client = $this->clientService->createClient($request->validated());
             return $this->successResponse('Client created successfully', ['client' => $client], 201);
@@ -54,8 +48,7 @@ class ClientController extends Controller
         }
     }
 
-    public function show(int $id): JsonResponse
-    {
+    public function show(int $id): JsonResponse {
         try {
             $client = $this->clientService->getClientById($id);
             return $this->successResponse('Client retrieved successfully', ['client' => $client]);
@@ -64,8 +57,7 @@ class ClientController extends Controller
         }
     }
 
-    public function update(UpdateClientRequest $request, int $id): JsonResponse
-    {
+    public function update(UpdateClientRequest $request, int $id): JsonResponse {
         try {
             $client = $this->clientService->updateClient($id, $request->validated());
             return $this->successResponse('Client updated successfully', ['client' => $client]);
@@ -74,8 +66,7 @@ class ClientController extends Controller
         }
     }
 
-    public function destroy(int $id): JsonResponse
-    {
+    public function destroy(int $id): JsonResponse {
         try {
             $this->clientService->deleteClient($id);
             return $this->successResponse('Client deleted successfully');

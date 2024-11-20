@@ -31,9 +31,33 @@ class StoreClientRequest extends FormRequest
             'address' => 'nullable|string',
             'city' => 'nullable|string',
             'province' => 'nullable|string',
-            'credit_limit' => 'nullable|numeric|min:0',
-            'balance' => 'nullable|numeric',
-            'status' => 'required|in:positive,current,negative',
+            'credit_limit' => 'sometimes|numeric|min:0',
+            'balance' => 'sometimes|numeric',
+            'status' => 'sometimes|in:positive,current,negative',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        // Establecer status por defecto si no existe
+        if (!$this->has('status')) {
+            $this->merge([
+                'status' => 'current'
+            ]);
+        }
+
+        // Establecer balance inicial en 0 si no existe
+        if (!$this->has('balance')) {
+            $this->merge([
+                'balance' => 0
+            ]);
+        }
+
+        // Establecer credit_limit inicial en 0 si no existe
+        if (!$this->has('credit_limit')) {
+            $this->merge([
+                'credit_limit' => 0
+            ]);
+        }
     }
 }

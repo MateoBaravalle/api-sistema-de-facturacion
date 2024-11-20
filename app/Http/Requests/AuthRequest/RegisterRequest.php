@@ -6,59 +6,66 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class RegisterRequest extends FormRequest
-{
+class RegisterRequest extends FormRequest {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
-    public function authorize()
-    {
+    public function authorize(): bool {
         return true;
     }
 
     /**
      * Handle a failed validation attempt.
      *
-     * @param \Illuminate\Contracts\Validation\Validator $validator The validator instance containing the validation errors.
-     * @throws \Illuminate\Http\Exceptions\HttpResponseException
+     * @throws HttpResponseException
      */
-    protected function failedValidation(Validator $validator)
-    {
+    protected function failedValidation(Validator $validator): never {
         throw new HttpResponseException(response()->json([
-            "message" => "Validation failed",
-            "error" => $validator->errors(),
+            'message' => 'Validation failed',
+            'error' => $validator->errors(),
         ], 422));
     }
 
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     * @return array<string, string>
      */
-    public function rules()
-    {
+    public function rules(): array {
         return [
+            'username' => 'required|string|max:255|unique:users,username|regex:/^[a-zA-Z0-9._-]+$/',
             'name' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
             'email' => 'required|string|email|unique:users,email',
             'password' => 'required|string|min:6',
+            'phone' => 'nullable|string|max:20',
         ];
     }
 
-    public function messages()
-    {
+    /**
+     * Get custom validation messages.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array {
         return [
-            'name.required' => 'The name field is required',
-            'name.string' => 'The name must be a string',
-            'name.max' => 'The name must not exceed 255 characters',
-            'email.required' => 'The email field is required',
-            'email.string' => 'The email must be a string',
-            'email.email' => 'The email must be a valid email address',
-            'email.unique' => 'The email has already been taken',
-            'password.required' => 'The password field is required',
-            'password.string' => 'The password must be a string',
-            'password.min' => 'The password must be at least 6 characters',
+            'username.required' => 'El nombre de usuario es requerido',
+            'username.string' => 'El nombre de usuario debe ser una cadena de texto',
+            'username.max' => 'El nombre de usuario no debe exceder 255 caracteres',
+            'username.unique' => 'Este nombre de usuario ya está en uso',
+            'username.regex' => 'El nombre de usuario solo puede contener letras, números y los caracteres . _ -',
+            'name.required' => 'El nombre es requerido',
+            'name.string' => 'El nombre debe ser una cadena de texto',
+            'name.max' => 'El nombre no debe exceder 255 caracteres',
+            'lastname.required' => 'El apellido es requerido',
+            'lastname.string' => 'El apellido debe ser una cadena de texto',
+            'lastname.max' => 'El apellido no debe exceder 255 caracteres',
+            'email.required' => 'El correo electrónico es requerido',
+            'email.email' => 'Debe ser un correo electrónico válido',
+            'email.unique' => 'Este correo electrónico ya está registrado',
+            'password.required' => 'La contraseña es requerida',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres',
+            'phone.max' => 'El teléfono no debe exceder 20 caracteres',
         ];
     }
 }

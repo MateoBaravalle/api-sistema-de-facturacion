@@ -3,13 +3,13 @@
 namespace App\Services;
 
 use App\Models\Client;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClientService
 {
-    public function getAllClients(): Collection
+    public function getAllClients(int $perPage = 10): LengthAwarePaginator
     {
-        return Client::all();
+        return Client::paginate($perPage);
     }
 
     public function getClientById(int $id): Client
@@ -30,7 +30,7 @@ class ClientService
     }
 
     public function deleteClient(int $id): void
-    {
+    { 
         $client = Client::findOrFail($id);
         $client->delete();
     }

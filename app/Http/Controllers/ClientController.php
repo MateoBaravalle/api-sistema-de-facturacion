@@ -6,6 +6,7 @@ use App\Http\Requests\ClientRequest\StoreClientRequest;
 use App\Http\Requests\ClientRequest\UpdateClientRequest;
 use App\Services\ClientService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ClientController extends Controller
 {
@@ -34,10 +35,11 @@ class ClientController extends Controller
         ], $code);
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
-            $clients = $this->clientService->getAllClients();
+            $perPage = $request->get('per_page', 10);
+            $clients = $this->clientService->getAllClients($perPage);
             return $this->successResponse('Clients retrieved successfully', ['clients' => $clients]);
         } catch (\Exception $e) {
             return $this->errorResponse('Failed to retrieve clients', $e->getMessage());

@@ -7,7 +7,6 @@ use App\Http\Requests\AuthRequest\RegisterRequest;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -16,32 +15,6 @@ class AuthController extends Controller
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
-    }
-
-    private function successResponse(string $message, array $data = [], int $code = 200): JsonResponse
-    {
-        return response()->json([
-            'status' => 'success',
-            'message' => $message,
-            ...$data,
-        ], $code);
-    }
-
-    private function errorResponse(string $message, ?string $error = null, int $code = 400): JsonResponse
-    {
-        return response()->json([
-            'status' => 'error',
-            'message' => $message,
-            'error' => $error,
-        ], $code);
-    }
-
-    protected function handleException(\Exception $e): JsonResponse
-    {
-        $code = $e instanceof JWTException ? 401 : 500;
-        $message = $e instanceof JWTException ? 'Token error' : 'Operation failed';
-
-        return $this->errorResponse($message, $e->getMessage(), $code);
     }
 
     public function register(RegisterRequest $request): JsonResponse

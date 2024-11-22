@@ -51,11 +51,14 @@ Route::group(['middleware' => 'api'], function () {
         Route::group(['middleware' => 'role:client'], function () {
             Route::get('/client/me', [ClientController::class, 'showProfile']);
             Route::put('/client/me', [ClientController::class, 'updateProfile']);
+            Route::get('/client/me/transactions', [ClientController::class, 'transactions']);
+            Route::get('/client/me/purchase-average', [ClientController::class, 'purchaseAverage']);
+            Route::get('/client/me/orders', [ClientController::class, 'orders']);
+            Route::get('/client/me/invoices', [ClientController::class, 'invoices']);
         });
 
         // Guest routes
         Route::group(['middleware' => 'role:guest'], function () {
-            Route::get('/user/{id}', [AuthController::class, 'show']);
         });
 
         // Rutas de Provider

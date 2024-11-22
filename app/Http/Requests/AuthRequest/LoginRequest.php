@@ -48,6 +48,7 @@ class LoginRequest extends FormRequest
     {
         return [
             'login.required' => 'El usuario o correo electrónico es requerido',
+            'login.string' => 'El usuario o correo electrónico debe ser una cadena de texto',
             'password.required' => 'La contraseña es requerida',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres',
         ];

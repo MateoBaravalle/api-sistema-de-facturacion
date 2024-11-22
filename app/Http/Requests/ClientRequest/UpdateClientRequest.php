@@ -33,9 +33,6 @@ class UpdateClientRequest extends FormRequest
             'address' => 'nullable|string',
             'city' => 'nullable|string',
             'province' => 'nullable|string',
-            'credit_limit' => 'nullable|numeric|min:0',
-            'balance' => 'nullable|numeric',
-            'status' => 'sometimes|in:positive,current,negative',
         ];
     }
 }

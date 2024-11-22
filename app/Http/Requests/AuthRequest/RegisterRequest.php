@@ -40,9 +40,9 @@ class RegisterRequest extends FormRequest
             'username' => 'required|string|max:255|unique:users,username|regex:/^[a-zA-Z0-9._-]+$/',
             'name' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users,email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:20|regex:/^[0-9]+$/',
         ];
     }
 
@@ -69,8 +69,10 @@ class RegisterRequest extends FormRequest
             'email.email' => 'Debe ser un correo electrónico válido',
             'email.unique' => 'Este correo electrónico ya está registrado',
             'password.required' => 'La contraseña es requerida',
+            'password.string' => 'La contraseña debe ser una cadena de texto',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres',
             'phone.max' => 'El teléfono no debe exceder 20 caracteres',
+            'phone.regex' => 'El teléfono solo puede contener números',
         ];
     }
 }

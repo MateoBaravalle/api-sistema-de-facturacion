@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Client;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClientService
@@ -30,8 +31,68 @@ class ClientService
     }
 
     public function deleteClient(int $id): void
-    { 
+    {
         $client = Client::findOrFail($id);
         $client->delete();
+    }
+
+    public function getTransactionHistory(int $clientId): Collection
+    {
+        $client = Client::findOrFail($clientId);
+        return $client->transactions()
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getOverdueTransactions(int $clientId): Collection
+    {
+        $client = Client::findOrFail($clientId);
+        return $client->transactions()
+            ->where('status', 'overdue')
+            ->orderBy('due_date', 'asc')
+            ->get();
+    }
+
+    public function calculatePurchaseAverages(int $clientId): array
+    {
+        $client = Client::findOrFail($clientId);
+        $transactions = $client->transactions;
+
+        return [
+            'one_month_average' => $transactions->where('created_at', '>=', now()->subMonth())->avg('amount') ?? 0,
+            'three_month_average' => $transactions->where('created_at', '>=', now()->subMonths(3))->avg('amount') ?? 0,
+            'six_month_average' => $transactions->where('created_at', '>=', now()->subMonths(6))->avg('amount') ?? 0,
+        ];
+    }
+
+    public function getClientOrders(int $clientId): Collection
+    {
+        $client = Client::findOrFail($clientId);
+        return $client->orders()
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getClientInvoices(int $clientId): Collection
+    {
+        $client = Client::findOrFail($clientId);
+        return $client->invoices()
+            ->orderBy('created_at', 'desc')
+            ->get();
+    }
+
+    public function getCurrentClient(): Client
+    {
+        return $this->getClientById($this->getCurrentClientId());
+    }    
+
+    public function updateCurrentClient(array $data): Client
+    {
+        return $this->updateClient($this->getCurrentClientId(), $data);
+    }
+
+    private function getCurrentClientId(): int
+    {
+        return auth('api')->user()->client_id;
     }
 }

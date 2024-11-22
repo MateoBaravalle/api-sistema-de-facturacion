@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\User;
-use Exception;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
@@ -37,13 +36,7 @@ class AuthService
     public function login(array $credentials): string
     {
         $credentials = $this->parseCredentials($credentials);
-        $token = JWTAuth::attempt($credentials);
-
-        if (!$token) {
-            throw new Exception('Invalid credentials');
-        }
-
-        return $token;
+        return JWTAuth::attempt($credentials);
     }
 
     /**

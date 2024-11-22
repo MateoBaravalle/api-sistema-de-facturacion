@@ -15,7 +15,6 @@ class CreateTransactionsTable extends Migration
             $table->text('description');
             $table->decimal('amount', 10, 2);
             $table->enum('status', ['pending', 'paid', 'partial_paid', 'overdue'])->default('pending');
-            $table->date('transaction_date');
             $table->date('due_date')->nullable();
             $table->timestamps();
         });

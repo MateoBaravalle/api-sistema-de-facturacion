@@ -15,14 +15,12 @@ class Transaction extends Model
         'description',
         'amount',
         'status',
-        'transaction_date',
         'due_date',
     ];
 
     protected $casts = [
         'amount' => 'decimal:2',
         'status' => 'string',
-        'transaction_date' => 'datetime',
         'due_date' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

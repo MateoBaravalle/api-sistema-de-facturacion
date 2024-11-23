@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRequest\CreateUserRequest;
 use App\Http\Requests\UserRequest\UpdateUserRequest;
 use App\Services\UserService;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -70,23 +69,11 @@ class UserController extends Controller
 
     public function showProfile(): JsonResponse
     {
-        $userId = auth()->id();
-    
-        if (!$userId) {
-            throw new AuthenticationException();
-        }
-
-        return $this->show($userId);
+        return $this->show(auth('api')->id());
     }
 
     public function updateProfile(UpdateUserRequest $request): JsonResponse
     {
-        $userId = auth()->id();
-    
-        if (!$userId) {
-            throw new AuthenticationException();
-        }
-
-        return $this->update($request, $userId);
+        return $this->update($request, auth('api')->id());
     }
 }

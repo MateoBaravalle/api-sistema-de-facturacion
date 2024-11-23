@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClientRequest\StoreClientRequest;
 use App\Http\Requests\ClientRequest\UpdateClientRequest;
 use App\Services\ClientService;
-use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -111,23 +110,11 @@ class ClientController extends Controller
 
     public function showProfile(): JsonResponse
     {
-        $clientId = auth()->id();
-
-        if (!$clientId) {
-            throw new AuthenticationException();
-        }
-
-        return $this->show($clientId);
+        return $this->show(auth('api')->id());
     }
 
     public function updateProfile(UpdateClientRequest $request): JsonResponse
     {
-        $clientId = auth()->id();
-
-        if (!$clientId) {
-            throw new AuthenticationException();
-        }
-
-        return $this->update($request, $clientId);
+        return $this->update($request, auth('api')->id());
     }
 }

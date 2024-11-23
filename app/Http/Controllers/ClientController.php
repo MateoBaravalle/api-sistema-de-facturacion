@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClientRequest\StoreClientRequest;
 use App\Http\Requests\ClientRequest\UpdateClientRequest;
 use App\Services\ClientService;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -110,21 +111,23 @@ class ClientController extends Controller
 
     public function showProfile(): JsonResponse
     {
-        try {
-            $client = $this->clientService->getCurrentClient();
-            return $this->successResponse('Profile retrieved successfully', ['client' => $client]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
+        $clientId = auth()->id();
+
+        if (!$clientId) {
+            throw new AuthenticationException();
         }
+
+        return $this->show($clientId);
     }
 
     public function updateProfile(UpdateClientRequest $request): JsonResponse
     {
-        try {
-            $client = $this->clientService->updateCurrentClient($request->validated());
-            return $this->successResponse('Profile updated successfully', ['client' => $client]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
+        $clientId = auth()->id();
+
+        if (!$clientId) {
+            throw new AuthenticationException();
         }
+
+        return $this->update($request, $clientId);
     }
 }

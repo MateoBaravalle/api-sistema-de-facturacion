@@ -80,19 +80,4 @@ class ClientService
             ->orderBy('created_at', 'desc')
             ->get();
     }
-
-    public function getCurrentClient(): Client
-    {
-        return $this->getClientById($this->getCurrentClientId());
-    }    
-
-    public function updateCurrentClient(array $data): Client
-    {
-        return $this->updateClient($this->getCurrentClientId(), $data);
-    }
-
-    private function getCurrentClientId(): int
-    {
-        return auth('api')->user()->client_id;
-    }
 }

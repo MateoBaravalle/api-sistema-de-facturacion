@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -51,14 +52,16 @@ Route::group(['middleware' => 'api'], function () {
         Route::group(['middleware' => 'role:client'], function () {
             Route::get('/client/me', [ClientController::class, 'showProfile']);
             Route::put('/client/me', [ClientController::class, 'updateProfile']);
-            Route::get('/client/me/transactions', [ClientController::class, 'transactions']);
-            Route::get('/client/me/purchase-average', [ClientController::class, 'purchaseAverage']);
-            Route::get('/client/me/orders', [ClientController::class, 'orders']);
-            Route::get('/client/me/invoices', [ClientController::class, 'invoices']);
+            Route::get('/client/transactions', [ClientController::class, 'showTransactions']);
+            Route::get('/client/purchase-average', [ClientController::class, 'showPurchaseAverage']);
+            Route::get('/client/orders', [ClientController::class, 'showOrders']);
+            Route::get('/client/invoices', [ClientController::class, 'showInvoices']);
+            Route::put('/user/me', [UserController::class, 'updateProfile']);
         });
-
+        
         // Guest routes
         Route::group(['middleware' => 'role:guest'], function () {
+            Route::get('/user/me', [UserController::class, 'showProfile']);
         });
 
         // Rutas de Provider

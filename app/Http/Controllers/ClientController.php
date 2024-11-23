@@ -117,4 +117,24 @@ class ClientController extends Controller
     {
         return $this->update($request, auth('api')->id());
     }
+
+    public function showTransactions(): JsonResponse
+    {
+        return $this->transactions(auth('api')->id());
+    }
+
+    public function showPurchaseAverage(): JsonResponse
+    {
+        return $this->purchaseAverage(auth('api')->id());
+    }
+
+    public function showOrders(): JsonResponse
+    {
+        return $this->orders(auth('api')->id());
+    }
+
+    public function showInvoices(): JsonResponse
+    {
+        return $this->invoices(auth('api')->id());
+    }
 }

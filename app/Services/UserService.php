@@ -2,51 +2,41 @@
 
 namespace App\Services;
 
+use App\Models\Role;
 use App\Models\User;
-use Exception;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class UserService
 {
-    /**
-     * Get all users with pagination
-     *
-     * @param int $perPage
-     * @return \Illuminate\Pagination\LengthAwarePaginator
-     */
-    public function getAllUsers(int $perPage = 10)
+    private const DEFAULT_PER_PAGE = 10;
+
+    private readonly User $user;
+
+    public function __construct(User $user)
     {
-        return User::paginate($perPage);
+        $this->user = $user;
     }
 
-    /**
-     * Get user by ID
-     *
-     * @param int $id
-     * @return User
-     */
+    public function getAllUsers(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    {
+        return $this->user->paginate($perPage);
+    }
+
     public function getUserById(int $id): User
     {
-        return User::findOrFail($id);
+        return $this->user->findOrFail($id);
     }
 
-    /**
-     * Create new user
-     *
-     * @param array $data
-     * @return User
-     */
     public function createUser(array $data): User
     {
-        return User::create($data);
+        return DB::transaction(function () use ($data) {
+            $user = $this->user->create($data);
+            $user->roles()->attach(Role::where('name', 'guest')->first());
+            return $user;
+        });
     }
 
-    /**
-     * Update user
-     *
-     * @param int $id
-     * @param array $data
-     * @return User
-     */
     public function updateUser(int $id, array $data): User
     {
         $user = $this->getUserById($id);
@@ -54,12 +44,6 @@ class UserService
         return $user->fresh();
     }
 
-    /**
-     * Delete user
-     *
-     * @param int $id
-     * @return bool
-     */
     public function deleteUser(int $id): bool
     {
         return $this->getUserById($id)->delete();

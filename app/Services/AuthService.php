@@ -10,6 +10,13 @@ use Tymon\JWTAuth\Facades\JWTAuth;
  */
 class AuthService
 {
+    private readonly User $user;
+    
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
     /**
      * Register a new user and return user data with JWT token
      *
@@ -18,12 +25,10 @@ class AuthService
      */
     public function register(array $data): array
     {
-        $user = User::create($data);
-        $token = JWTAuth::fromUser($user);
-
+        $user = $this->user->create($data);
         return [
             'user' => $user,
-            'token' => $token,
+            'token' => JWTAuth::fromUser($user),
         ];
     }
 
@@ -44,9 +49,9 @@ class AuthService
      *
      * @param string $token
      */
-    public function logout(string $token): void
+    public function logout(): void
     {
-        JWTAuth::setToken($token)->invalidate();
+        JWTAuth::invalidate(JWTAuth::getToken());
     }
 
     /**
@@ -55,9 +60,9 @@ class AuthService
      * @param string $token
      * @return string
      */
-    public function refresh(string $token): string
+    public function refresh(): string
     {
-        return JWTAuth::setToken($token)->refresh();
+        return JWTAuth::refresh(JWTAuth::getToken());
     }
 
     /**

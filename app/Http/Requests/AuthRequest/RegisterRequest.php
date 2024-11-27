@@ -42,7 +42,7 @@ class RegisterRequest extends FormRequest
             'lastname' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'phone' => 'nullable|string|max:20|regex:/^[0-9]+$/',
+            'phone' => 'sometimes|string|max:20|regex:/^[0-9]+$/',
         ];
     }
 

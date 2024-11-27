@@ -42,26 +42,26 @@ Route::group(['middleware' => 'api'], function () {
             Route::post('/client', [ClientController::class, 'store']);
             Route::put('/client/{id}', [ClientController::class, 'update']);
             Route::delete('/client/{id}', [ClientController::class, 'destroy']);
-            Route::get('/client/{id}/transactions', [ClientController::class, 'transactions']);
-            Route::get('/client/{id}/purchase-average', [ClientController::class, 'purchaseAverage']);
-            Route::get('/client/{id}/orders', [ClientController::class, 'orders']);
-            Route::get('/client/{id}/invoices', [ClientController::class, 'invoices']);
+            Route::get('/client/{id}/transactions', [ClientController::class, 'transactions']);// Cambiar, usar ruta y modelo de transacciones
+            Route::get('/client/{id}/purchase-average', [ClientController::class, 'purchaseAverage']);// Integrar una prop en el modelo de cliente para mostrar el promedio de compras - Que el mismo se calcule x cron job
+            Route::get('/client/{id}/orders', [ClientController::class, 'orders']);// Cambiar, usar ruta y modelo de ordenes
+            Route::get('/client/{id}/invoices', [ClientController::class, 'invoices']);// Cambiar, usar ruta y modelo de facturas
         });
 
         // Client routes
         Route::group(['middleware' => 'role:client'], function () {
             Route::get('/client/me', [ClientController::class, 'showProfile']);
             Route::put('/client/me', [ClientController::class, 'updateProfile']);
-            Route::get('/client/transactions', [ClientController::class, 'showTransactions']);
-            Route::get('/client/purchase-average', [ClientController::class, 'showPurchaseAverage']);
-            Route::get('/client/orders', [ClientController::class, 'showOrders']);
-            Route::get('/client/invoices', [ClientController::class, 'showInvoices']);
+            Route::get('/client/purchase-average', [ClientController::class, 'showPurchaseAverage']);// Integrar una prop en el modelo de cliente para mostrar el promedio de compras - Que el mismo se calcule x cron job
+            Route::get('/client/transactions', [ClientController::class, 'showTransactions']); // Cambiar, usar ruta y modelo de transacciones
+            Route::get('/client/orders', [ClientController::class, 'showOrders']);// Cambiar, usar ruta y modelo de ordenes
+            Route::get('/client/invoices', [ClientController::class, 'showInvoices']);// Cambiar, usar ruta y modelo de facturas
             Route::put('/user/me', [UserController::class, 'updateProfile']);
         });
         
         // Guest routes
         Route::group(['middleware' => 'role:guest'], function () {
-            Route::get('/user/me', [UserController::class, 'showProfile']);
+            Route::get('/user/me', [UserController::class, 'showProfile']);// Vista del perfil antes de obtener un rol
         });
 
         // Rutas de Provider

@@ -9,24 +9,28 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClientService extends Service
 {
+    protected const MODEL = 'client';
+
     public function __construct(Client $client)
     {
-        parent::__construct($client, 'client');
+        parent::__construct($client, self::MODEL);
     }
 
     public function getAllClients(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->remember('clients.all', fn () =>$this->paginate($this->model->query(), $perPage));
+        return $this->remember('clients.all', fn () => $this->paginate($this->model->query(), $perPage));
     }
 
     public function getClientById(int $id): Client
     {
-        return $this->model->findOrFail($id);
+        return $this->getById($id, self::MODEL);
     }
 
     public function createClient(array $data): Client
     {
-        return $this->model->create($data);
+        $client = $this->create($data);
+        $this->clearModelCache($client->id, [self::MODEL]);
+        return $client;
     }
 
     public function updateClient(int $id, array $data): Client
@@ -45,7 +49,17 @@ class ClientService extends Service
 
     public function deleteClient(int $id): bool
     {
-        return $this->getClientById($id)->delete();
+        $deleted = $this->getClientById($id)->delete();
+
+        if ($deleted) {
+            $this->clearModelCacheWithSuffixes(
+                $id,
+                ['client', 'transactions', 'orders', 'invoices'],
+                ['pending', 'completed', 'averages']
+            );
+        }
+
+        return $deleted;
     }
 
     public function getTransactionHistory(int $clientId): Collection
@@ -90,7 +104,7 @@ class ClientService extends Service
     {
         return $this->getTransactionHistory($clientId)
             ->where('status', 'overdue')
-            ->pipe(fn ($query) => $this->getOrderedQuery($query, 'due_date', 'asc'));
+            ->orderBy('due_date', 'asc');
     }
 
     private function computeAverages(int $clientId): array

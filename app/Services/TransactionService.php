@@ -8,6 +8,8 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class TransactionService extends Service
 {
+    protected const MODEL = 'transaction';
+
     public function __construct(Transaction $transaction)
     {
         parent::__construct($transaction, 'transaction');
@@ -22,13 +24,13 @@ class TransactionService extends Service
     {
         return $this->remember(
             $this->getCacheKey('transaction', $id),
-            fn () => $this->model->findOrFail($id)
+            fn () => $this->getById($id, self::MODEL)
         );
     }
 
     public function createTransaction(array $data): Transaction
     {
-        $transaction = $this->model->create($data);
+        $transaction = $this->create($data);
         $this->clearModelCache($transaction->id, ['transaction']);
         return $transaction;
     }
@@ -52,10 +54,11 @@ class TransactionService extends Service
 
     public function getTransactionsByStatus(string $status): Collection
     {
-        return $this->remember("transactions.{$status}", function () use ($status) {
-            return $this->model->where('status', $status)
+        return $this->remember(
+            "transactions.status.{$status}",
+            fn () => $this->model->where('status', $status)
                 ->orderBy('due_date', 'asc')
-                ->get();
-        });
+                ->get()
+        );
     }
 }

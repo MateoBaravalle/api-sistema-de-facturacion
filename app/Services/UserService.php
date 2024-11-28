@@ -7,32 +7,31 @@ use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
-class UserService
+class UserService extends Service
 {
-    private const DEFAULT_PER_PAGE = 10;
-
-    private readonly User $user;
+    protected const MODEL = 'user';
 
     public function __construct(User $user)
     {
-        $this->user = $user;
+        parent::__construct($user, self::MODEL);
     }
 
     public function getAllUsers(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->user->paginate($perPage);
+        return $this->remember('users.all', fn () => $this->paginate($this->model->query(), $perPage));
     }
 
     public function getUserById(int $id): User
     {
-        return $this->user->findOrFail($id);
+        return $this->getById($id, self::MODEL);
     }
 
     public function createUser(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            $user = $this->user->create($data);
+            $user = $this->create($data);
             $user->roles()->attach(Role::where('name', 'guest')->first());
+            $this->clearModelCache($user->id, ['user', 'roles']);
             return $user;
         });
     }
@@ -41,11 +40,19 @@ class UserService
     {
         $user = $this->getUserById($id);
         $user->update($data);
+        $this->clearModelCache($id, ['user', 'roles']);
         return $user->fresh();
     }
 
     public function deleteUser(int $id): bool
     {
-        return $this->getUserById($id)->delete();
+        $user = $this->getUserById($id);
+        $deleted = $user->delete();
+        
+        if ($deleted) {
+            $this->clearModelCache($id, ['user', 'roles']);
+        }
+        
+        return $deleted;
     }
 }

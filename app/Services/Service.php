@@ -11,12 +11,25 @@ abstract class Service
 {
     protected const DEFAULT_PER_PAGE = 10;
     protected const DEFAULT_ORDER = 'desc';
-    protected const CACHE_TTL = 3600;
+    protected const CACHE_TTL = 1440;
     
     public function __construct(
         protected readonly Model $model,
         protected readonly string $cachePrefix
     ) {
+    }
+
+    protected function create(array $data): Model
+    {
+        return $this->model->create($data);
+    }
+    
+    protected function getById(int $id, string $model): Model
+    {
+        return $this->remember(
+            $this->getCacheKey($model, $id),
+            fn () => $this->model->findOrFail($id)
+        );
     }
 
     protected function remember(string $key, callable $callback): mixed
@@ -66,8 +79,8 @@ abstract class Service
      * @return Builder
      */
     protected function getOrderedQuery(
-        Builder $query, 
-        string $orderBy = 'created_at', 
+        Builder $query,
+        string $orderBy = 'created_at',
         string $direction = self::DEFAULT_ORDER
     ): Builder {
         return $query->orderBy($orderBy, $direction);

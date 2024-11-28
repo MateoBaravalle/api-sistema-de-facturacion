@@ -12,7 +12,7 @@ class TransactionService extends Service
 
     public function __construct(Transaction $transaction)
     {
-        parent::__construct($transaction, 'transaction');
+        parent::__construct($transaction, self::MODEL);
     }
 
     public function getAllTransactions(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator

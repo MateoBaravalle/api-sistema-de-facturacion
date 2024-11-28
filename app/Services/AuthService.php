@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
@@ -10,11 +9,11 @@ use Tymon\JWTAuth\Facades\JWTAuth;
  */
 class AuthService
 {
-    private readonly User $user;
+    private readonly UserService $userService;
     
-    public function __construct(User $user)
+    public function __construct(UserService $userService)
     {
-        $this->user = $user;
+        $this->userService = $userService;
     }
 
     /**
@@ -25,7 +24,7 @@ class AuthService
      */
     public function register(array $data): array
     {
-        $user = $this->user->create($data);
+        $user = $this->userService->createUser($data);
         return [
             'user' => $user,
             'token' => JWTAuth::fromUser($user),

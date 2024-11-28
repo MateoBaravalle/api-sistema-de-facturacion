@@ -36,7 +36,7 @@ class User extends Authenticatable implements JWTSubject
     // Relationships
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class, 'user_role');
+        return $this->belongsToMany(Role::class);
     }
 
     public function notifications(): HasMany
@@ -77,7 +77,7 @@ class User extends Authenticatable implements JWTSubject
     }
 
     // Helper methods
-    public function hasAnyRole($roles): bool
+    public function hasAnyRole(string|array $roles): bool
     {
         if (is_array($roles)) {
             return $this->roles->whereIn('name', $roles)->count() > 0;
@@ -85,7 +85,7 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasRole($roles);
     }
 
-    public function hasAllRoles($roles): bool
+    public function hasAllRoles(string|array $roles): bool
     {
         if (is_array($roles)) {
             return $this->roles->whereIn('name', $roles)->count() === count($roles);

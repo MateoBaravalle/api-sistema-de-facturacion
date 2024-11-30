@@ -23,7 +23,18 @@ abstract class Service
     {
         return $this->model->create($data);
     }
-    
+
+    protected function getAll(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    {
+        return $this->remember(
+            $this->getCacheKey('all'),
+            fn () => $this->paginate(
+                $this->model->query(),
+                $perPage
+            )
+        );
+    }
+
     protected function getById(int $id, string $model): Model
     {
         return $this->remember(
@@ -42,9 +53,12 @@ abstract class Service
         Cache::forget($key);
     }
 
-    protected function getCacheKey(string $type, int $id): string
+    protected function getCacheKey(string $type, int $id = null): string
     {
-        return sprintf('%s.%d.%s', $this->cachePrefix, $id, $type);
+        if ($id) {
+            return sprintf('%s.%s.%d', $this->cachePrefix, $type, $id);
+        }
+        return sprintf('%s.%s', $this->cachePrefix, $type);
     }
 
     protected function clearModelCache(int $id, array $types): void

@@ -18,7 +18,7 @@ class UserService extends Service
 
     public function getAllUsers(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->remember('users.all', fn () => $this->paginate($this->model->query(), $perPage));
+        return $this->getAll($perPage);
     }
 
     public function getUserById(int $id): User

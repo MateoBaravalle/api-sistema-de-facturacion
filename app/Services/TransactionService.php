@@ -15,16 +15,21 @@ class TransactionService extends Service
         parent::__construct($transaction, self::MODEL);
     }
 
-    public function getAllTransactions(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllTransactions(int $perPage): LengthAwarePaginator
     {
-        return $this->remember('transactions.all', fn () => $this->paginate($this->model->query(), $perPage));
+        return $this->getAll($perPage);
     }
 
     public function getTransactionById(int $id): Transaction
     {
+        return $this->getById($id, self::MODEL);
+    }
+
+    public function getTransactionByClientId(int $clientId): Collection
+    {
         return $this->remember(
-            $this->getCacheKey('transaction', $id),
-            fn () => $this->getById($id, self::MODEL)
+            $this->getCacheKey('client', $clientId),
+            fn () => $this->model->where('client_id', $clientId)
         );
     }
 
@@ -55,10 +60,31 @@ class TransactionService extends Service
     public function getTransactionsByStatus(string $status): Collection
     {
         return $this->remember(
-            "transactions.status.{$status}",
+            $this->getCacheKey('status', $status),
             fn () => $this->model->where('status', $status)
                 ->orderBy('due_date', 'asc')
                 ->get()
         );
+    }
+
+    public function getAverageTransactionAmount(int $clientId): array
+    {
+        $cacheKey = $this->getCacheKey('average', $clientId);
+        $transactions = $this->getTransactionByClientId($clientId);
+
+        $result = [
+            'one_month_average' => $this->calculateAverageForPeriod($transactions, 1),
+            'three_month_average' => $this->calculateAverageForPeriod($transactions, 3),
+            'six_month_average' => $this->calculateAverageForPeriod($transactions, 6),
+            'total_average' => $transactions->avg('amount') ?? 0,
+        ];
+
+        return $this->remember($cacheKey, fn () => $result);
+    }
+
+    private function calculateAverageForPeriod(Collection $transactions, int $months): float
+    {
+        return $transactions->where('created_at', '>=', now()->subMonths($months))
+            ->avg('amount') ?? 0;
     }
 }

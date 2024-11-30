@@ -16,7 +16,7 @@ class RoleService extends Service
 
     public function getAllRoles(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->remember('roles.all', fn () => $this->paginate($this->model->query(), $perPage));
+        return $this->getAll($perPage);
     }
 
     public function getRoleById(int $id): Role

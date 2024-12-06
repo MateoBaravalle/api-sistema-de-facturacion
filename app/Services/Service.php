@@ -38,15 +38,18 @@ abstract class Service
     protected function getById(int $id): Model
     {
         return $this->remember(
-            $this->getCacheKey($this->cachePrefix, $id),
+            $this->getCacheKey('id', $id),
             fn () => $this->model->findOrFail($id)
         );
     }
 
     protected function getByIdWith(int $id, array $relation): Model
     {
+        sort($relation);
+        $cacheKey = $this->getCacheKey('with.' . implode('.', $relation), $id);
+
         return $this->remember(
-            $this->getCacheKey($this->cachePrefix, $id, implode('.', $relation)),
+            $cacheKey,
             fn () => $this->model->with($relation)->findOrFail($id)
         );
     }
@@ -68,10 +71,10 @@ abstract class Service
         Cache::forget($key);
     }
 
-    protected function getCacheKey(string $type, int $id = null, string $suffix = null): string
+    protected function getCacheKey(string $type, int $id = null): string
     {
         if ($id) {
-            return sprintf('%s.%s.%d', $this->cachePrefix, $type, $id, $suffix ? '.' . $suffix : '');
+            return sprintf('%s.%s.%d', $this->cachePrefix, $type, $id);
         }
         return sprintf('%s.%s', $this->cachePrefix, $type);
     }
@@ -91,12 +94,17 @@ abstract class Service
      * @param array<string> $suffixes
      * @return void
      */
-    protected function clearModelCacheWithSuffixes(int $id, array $types, array $suffixes = []): void
+    protected function clearModelCacheWithSuffixes(?int $id, array $types, array $suffixes = []): void
     {
         foreach ($types as $type) {
-            $this->forget($this->getCacheKey($type, $id));
+            $cacheKey = $id ? $this->getCacheKey($type, $id) : $this->getCacheKey($type);
+            $this->forget($cacheKey);
+
             foreach ($suffixes as $suffix) {
-                $this->forget($this->getCacheKey($type . '.' . $suffix, $id));
+                $cacheKeyWithSuffix = $id
+                    ? $this->getCacheKey($type . '.' . $suffix, $id)
+                    : $this->getCacheKey($type . '.' . $suffix);
+                $this->forget($cacheKeyWithSuffix);
             }
         }
     }

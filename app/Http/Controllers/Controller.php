@@ -28,7 +28,7 @@ class Controller extends BaseController
         ];
         
         if (!empty($data)) {
-            $response = array_merge($response, $data);
+            $response['data'] = $data;
         }
         
         return response()->json($response, $code);

@@ -69,11 +69,11 @@ class UserController extends Controller
 
     public function showProfile(): JsonResponse
     {
-        return $this->show(auth('api')->id());
+        return $this->show(auth()->id());
     }
 
     public function updateProfile(UpdateUserRequest $request): JsonResponse
     {
-        return $this->update($request, auth('api')->id());
+        return $this->update($request, auth()->id());
     }
 }

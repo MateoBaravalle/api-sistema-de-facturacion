@@ -22,17 +22,7 @@ class ClientController extends Controller
         try {
             $perPage = $request->get('per_page', 10);
             $clients = $this->clientService->getAllClients($perPage);
-            return $this->successResponse('Clients retrieved successfully', ['clients' => $clients]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
-    }
-
-    public function store(StoreClientRequest $request): JsonResponse
-    {
-        try {
-            $client = $this->clientService->createClient($request->validated());
-            return $this->successResponse('Client created successfully', ['client' => $client], 201);
+            return $this->successResponse('Clients retrieved successfully', [...$clients]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -42,7 +32,17 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->getClientById($id);
-            return $this->successResponse('Client retrieved successfully', ['client' => $client]);
+            return $this->successResponse('Client retrieved successfully', [$client]);
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    public function store(StoreClientRequest $request): JsonResponse
+    {
+        try {
+            $client = $this->clientService->createClient($request->validated());
+            return $this->successResponse('Client created successfully', [$client], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -52,7 +52,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->updateClient($id, $request->validated());
-            return $this->successResponse('Client updated successfully', ['client' => $client]);
+            return $this->successResponse('Client updated successfully', [$client]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -68,73 +68,13 @@ class ClientController extends Controller
         }
     }
 
-    public function transactions(int $id): JsonResponse
-    {
-        try {
-            $transactions = $this->clientService->getTransactionHistory($id);
-            return $this->successResponse('Transactions retrieved successfully', ['transactions' => $transactions]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
-    }
-
-    public function purchaseAverage(int $id): JsonResponse
-    {
-        try {
-            $averages = $this->clientService->calculatePurchaseAverages($id);
-            return $this->successResponse('Purchase averages calculated successfully', ['averages' => $averages]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
-    }
-
-    public function orders(int $id): JsonResponse
-    {
-        try {
-            $orders = $this->clientService->getClientOrders($id);
-            return $this->successResponse('Orders retrieved successfully', ['orders' => $orders]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
-    }
-
-    public function invoices(int $id): JsonResponse
-    {
-        try {
-            $invoices = $this->clientService->getClientInvoices($id);
-            return $this->successResponse('Invoices retrieved successfully', ['invoices' => $invoices]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
-    }
-
     public function showProfile(): JsonResponse
     {
-        return $this->show(auth('api')->id());
+        return $this->show(auth()->id());
     }
 
     public function updateProfile(UpdateClientRequest $request): JsonResponse
     {
-        return $this->update($request, auth('api')->id());
-    }
-
-    public function showTransactions(): JsonResponse
-    {
-        return $this->transactions(auth('api')->id());
-    }
-
-    public function showPurchaseAverage(): JsonResponse
-    {
-        return $this->purchaseAverage(auth('api')->id());
-    }
-
-    public function showOrders(): JsonResponse
-    {
-        return $this->orders(auth('api')->id());
-    }
-
-    public function showInvoices(): JsonResponse
-    {
-        return $this->invoices(auth('api')->id());
+        return $this->update($request, auth()->id());
     }
 }

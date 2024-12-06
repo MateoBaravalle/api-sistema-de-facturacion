@@ -5,10 +5,10 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
-    // Definir jerarquía de roles (mayor índice = mayor jerarquía)
     private const ROLE_HIERARCHY = [
         'guest' => 0,
         'client' => 1,
@@ -19,29 +19,29 @@ class CheckRole
 
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        $user = auth()->user();
-        $userRoles = $user->roles->pluck('name')->toArray();
-        
-        // Obtener el nivel más alto del usuario
-        $userMaxLevel = $this->getMaxLevel($userRoles);
-        // Obtener el nivel más alto requerido
-        $requiredMaxLevel = $this->getMaxLevel($roles);
+        try {
+            $user = auth()->user();
 
-        Log::info('Role check:', [
-            'user_roles' => $userRoles,
-            'required_roles' => $roles,
-            'user_level' => $userMaxLevel,
-            'required_level' => $requiredMaxLevel,
-        ]);
+            if (!$user) {
+                return $this->unauthorized('Usuario no autenticado');
+            }
 
-        // Usuario pasa si su nivel es mayor o igual al requerido
-        if ($userMaxLevel < $requiredMaxLevel) {
-            return response()->json([
-                'message' => 'No tienes permisos suficientes',
-            ], 403);
+            $userRoles = $user->roles->pluck('name')->toArray();
+            
+            $userMaxLevel = $this->getMaxLevel($userRoles);
+            $requiredMaxLevel = $this->getMaxLevel($roles);
+
+            $this->logRoleCheck($userRoles, $roles, $userMaxLevel, $requiredMaxLevel);
+
+            if ($userMaxLevel < $requiredMaxLevel) {
+                return $this->forbidden('No tienes permisos suficientes');
+            }
+
+            return $next($request);
+        } catch (\Exception $e) {
+            Log::error('Role check error: ' . $e->getMessage());
+            return $this->serverError('Error en la verificación de roles');
         }
-
-        return $next($request);
     }
 
     private function getMaxLevel(array $roles): int
@@ -49,5 +49,39 @@ class CheckRole
         return max(array_map(function ($role) {
             return self::ROLE_HIERARCHY[$role] ?? self::ROLE_HIERARCHY['guest'];
         }, $roles));
+    }
+
+    private function logRoleCheck(array $userRoles, array $roles, int $userMaxLevel, int $requiredMaxLevel): void
+    {
+        Log::info('Role check details:', [
+            'user_roles' => $userRoles,
+            'required_roles' => $roles,
+            'user_level' => $userMaxLevel,
+            'required_level' => $requiredMaxLevel,
+        ]);
+    }
+
+    private function unauthorized(string $message): Response
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $message,
+        ], Response::HTTP_UNAUTHORIZED);
+    }
+
+    private function forbidden(string $message): Response
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $message,
+        ], Response::HTTP_FORBIDDEN);
+    }
+
+    private function serverError(string $message): Response
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $message,
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

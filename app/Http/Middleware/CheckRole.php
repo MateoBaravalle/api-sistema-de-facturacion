@@ -19,7 +19,7 @@ class CheckRole
 
     public function handle(Request $request, Closure $next, ...$roles)
     {
-        $user = auth('api')->user();
+        $user = auth()->user();
         $userRoles = $user->roles->pluck('name')->toArray();
         
         // Obtener el nivel más alto del usuario

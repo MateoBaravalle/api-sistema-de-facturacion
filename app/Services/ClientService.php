@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Client;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ClientService extends Service
@@ -25,14 +24,14 @@ class ClientService extends Service
 
     public function getClientById(int $id): Client
     {
-        return $this->getById($id, self::MODEL);
+        return $this->getById($id);
     }
 
     public function createClient(array $data): Client
     {
         $client = $this->create($data);
         $this->clearModelCache($client->id, [self::MODEL]);
-        return $client;
+        return $client->fresh();
     }
 
     public function updateClient(int $id, array $data): Client
@@ -62,29 +61,5 @@ class ClientService extends Service
         }
 
         return $deleted;
-    }
-
-    public function getClientOrders(int $clientId): Collection
-    {
-        $cacheKey = $this->getCacheKey('orders', $clientId);
-        return $this->remember($cacheKey, fn () => $this->fetchOrders($clientId));
-    }
-
-    public function getClientInvoices(int $clientId): Collection
-    {
-        $cacheKey = $this->getCacheKey('invoices', $clientId);
-        return $this->remember($cacheKey, fn () => $this->fetchInvoices($clientId));
-    }
-
-    private function fetchOrders(int $clientId): Collection
-    {
-        $query = $this->getClientById($clientId)->orders()->query();
-        return $this->getOrderedQuery($query)->get();
-    }
-
-    private function fetchInvoices(int $clientId): Collection
-    {
-        $query = $this->getClientById($clientId)->invoices()->query();
-        return $this->getOrderedQuery($query)->get();
     }
 }

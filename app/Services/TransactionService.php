@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Transaction;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -20,17 +21,52 @@ class TransactionService extends Service
         return $this->getAll($perPage);
     }
 
-    public function getTransactionById(int $id): Transaction
+    public function getTransactionByClient(int $clientId, int $perPage = null): Collection | LengthAwarePaginator
     {
-        return $this->getById($id, self::MODEL);
+        $cacheKey = $perPage
+            ? $this->getCacheKey("client.{$clientId}.page.{$perPage}")
+            : $this->getCacheKey("client.{$clientId}.all");
+
+        return $this->remember(
+            $cacheKey,
+            function () use ($clientId, $perPage) {
+                $query = $this->model->where('client_id', $clientId);
+
+                if ($perPage) {
+                    return $this->paginate($query, $perPage);
+                }
+
+                return $query->get();
+            }
+        );
     }
 
-    public function getTransactionByClientId(int $clientId): Collection
+    public function getTransactionsByStatus(string $status, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
+        $cacheKey = $this->getCacheKey("status.{$status}");
+
         return $this->remember(
-            $this->getCacheKey('client', $clientId),
-            fn () => $this->model->where('client_id', $clientId)
+            $cacheKey,
+            fn () => $this->paginate(
+                $this->model->where('status', $status)
+                    ->orderBy('due_date', 'asc'),
+                $perPage
+            )
         );
+    }
+
+    public function getTransactionById(int $id): Transaction
+    {
+        return $this->getById($id);
+    }
+
+    public function getMyTransactionById(int $id): Transaction
+    {
+        if (!$this->belongsToClient($id)) {
+            throw new AuthorizationException('Transaction does not belong to the current client');
+        }
+
+        return $this->getTransactionById($id);
     }
 
     public function createTransaction(array $data): Transaction
@@ -50,6 +86,15 @@ class TransactionService extends Service
         return $transaction->fresh();
     }
 
+    public function updateMyTransaction(int $id, array $data): Transaction
+    {
+        if (!$this->belongsToClient($id)) {
+            throw new AuthorizationException('Transaction does not belong to the current client');
+        }
+
+        return $this->updateTransaction($id, $data);
+    }
+
     public function deleteTransaction(int $id): bool
     {
         $transaction = $this->getTransactionById($id);
@@ -57,20 +102,10 @@ class TransactionService extends Service
         return $transaction->delete();
     }
 
-    public function getTransactionsByStatus(string $status): Collection
-    {
-        return $this->remember(
-            $this->getCacheKey('status', $status),
-            fn () => $this->model->where('status', $status)
-                ->orderBy('due_date', 'asc')
-                ->get()
-        );
-    }
-
     public function getAverageTransactionAmount(int $clientId): array
     {
-        $cacheKey = $this->getCacheKey('average', $clientId);
-        $transactions = $this->getTransactionByClientId($clientId);
+        $cacheKey = $this->getCacheKey('average.client', $clientId);
+        $transactions = $this->getTransactionByClient($clientId);
 
         $result = [
             'one_month_average' => $this->calculateAverageForPeriod($transactions, 1),

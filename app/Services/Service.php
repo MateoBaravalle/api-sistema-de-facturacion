@@ -35,12 +35,27 @@ abstract class Service
         );
     }
 
-    protected function getById(int $id, string $model): Model
+    protected function getById(int $id): Model
     {
         return $this->remember(
-            $this->getCacheKey($model, $id),
+            $this->getCacheKey($this->cachePrefix, $id),
             fn () => $this->model->findOrFail($id)
         );
+    }
+
+    protected function getByIdWith(int $id, array $relation): Model
+    {
+        return $this->remember(
+            $this->getCacheKey($this->cachePrefix, $id, implode('.', $relation)),
+            fn () => $this->model->with($relation)->findOrFail($id)
+        );
+    }
+
+    protected function belongsToClient(int $id): bool
+    {
+        return $this->model->where('id', $id)
+            ->where('client_id', auth()->user()->client->id)
+            ->exists();
     }
 
     protected function remember(string $key, callable $callback): mixed
@@ -53,10 +68,10 @@ abstract class Service
         Cache::forget($key);
     }
 
-    protected function getCacheKey(string $type, int $id = null): string
+    protected function getCacheKey(string $type, int $id = null, string $suffix = null): string
     {
         if ($id) {
-            return sprintf('%s.%s.%d', $this->cachePrefix, $type, $id);
+            return sprintf('%s.%s.%d', $this->cachePrefix, $type, $id, $suffix ? '.' . $suffix : '');
         }
         return sprintf('%s.%s', $this->cachePrefix, $type);
     }

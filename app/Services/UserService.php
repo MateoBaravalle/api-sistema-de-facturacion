@@ -23,14 +23,17 @@ class UserService extends Service
 
     public function getUserById(int $id): User
     {
-        return $this->getById($id, self::MODEL);
+        return $this->getById($id);
     }
 
     public function createUser(array $data): User
     {
-        return DB::transaction(function () use ($data) {
+        $role = $data['role'];
+        unset($data['role']);
+
+        return DB::transaction(function () use ($data, $role) {
             $user = $this->create($data);
-            $user->roles()->attach(Role::where('name', 'guest')->first());
+            $user->roles()->attach(Role::where('name', $role)->first());
             $this->clearModelCache($user->id, ['user', 'roles']);
             return $user;
         });
@@ -38,9 +41,16 @@ class UserService extends Service
 
     public function updateUser(int $id, array $data): User
     {
+        $role = $data['role'];
+        unset($data['role']);
+        
         $user = $this->getUserById($id);
         $user->update($data);
+
+        $user->roles()->sync(Role::where('name', $role)->first());
+        
         $this->clearModelCache($id, ['user', 'roles']);
+        
         return $user->fresh();
     }
 

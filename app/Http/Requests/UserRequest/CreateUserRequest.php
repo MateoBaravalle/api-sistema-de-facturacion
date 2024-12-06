@@ -31,6 +31,7 @@ class CreateUserRequest extends FormRequest
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
             'phone' => 'nullable|string|max:20|regex:/^[0-9]+$/',
+            'role' => 'sometimes|exists:roles,name',
         ];
     }
 
@@ -57,5 +58,14 @@ class CreateUserRequest extends FormRequest
             'phone.max' => 'El teléfono no debe exceder 20 caracteres',
             'phone.regex' => 'El teléfono solo puede contener números',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        if (!$this->has('role')) {
+            $this->merge([
+                'role' => 'guest'
+            ]);
+        }
     }
 }

@@ -32,6 +32,7 @@ class UpdateUserRequest extends FormRequest
             'email' => "sometimes|email|unique:users,email,{$userId}",
             'password' => 'sometimes|string|min:6',
             'phone' => 'nullable|string|max:20|regex:/^[0-9]+$/',
+            'role' => 'sometimes|exists:roles,name',
         ];
     }
 

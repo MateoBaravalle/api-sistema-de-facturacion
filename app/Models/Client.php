@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,18 +24,17 @@ class Client extends Model
         'province',
         'credit_limit',
         'balance',
-        'status',
     ];
 
     protected $casts = [
         'credit_limit' => 'decimal:2',
         'balance' => 'decimal:2',
-        'status' => 'string',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
 
+    // Relaciones
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -53,5 +53,49 @@ class Client extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    // Scopes
+    public function scopeActive($query): Builder
+    {
+        return $query->whereNull('deleted_at');
+    }
+
+    public function scopeInactive($query): Builder
+    {
+        return $query->whereNotNull('deleted_at');
+    }
+
+    public function scopePositive($query): Builder
+    {
+        return $query->where('balance', '>=', 0);
+    }
+
+    public function scopeNegative($query): Builder
+    {
+        return $query->where('balance', '<', 0);
+    }
+
+    public function scopeProvince($query, $province): Builder
+    {
+        return $query->where('province', $province);
+    }
+
+    public function scopeCity($query, $city): Builder
+    {
+        return $query->where('city', $city);
+    }
+
+    // Métodos
+    public function addBalance($amount): void
+    {
+        $this->balance += $amount;
+        $this->save();
+    }
+
+    public function subtractBalance($amount): void
+    {
+        $this->balance -= $amount;
+        $this->save();
     }
 }

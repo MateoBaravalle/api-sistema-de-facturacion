@@ -73,22 +73,6 @@ class StoreClientRequest extends FormRequest
             ]);
         }
 
-        // Establecer status basado en el valor de balance
-        if (!$this->has('status')) {
-            $balance = $this->input('balance');
-            $status = 'current';
-
-            if ($balance > 0) {
-                $status = 'positive';
-            } elseif ($balance < 0) {
-                $status = 'negative';
-            }
-
-            $this->merge([
-                'status' => $status,
-            ]);
-        }
-
         // Establecer credit_limit inicial en 0 si no existe
         if (!$this->has('credit_limit')) {
             $this->merge([

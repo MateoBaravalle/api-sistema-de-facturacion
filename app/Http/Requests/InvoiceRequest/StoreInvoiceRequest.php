@@ -51,21 +51,18 @@ class StoreInvoiceRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        // Establecer fecha actual si no existe
         if (!$this->has('date')) {
             $this->merge([
                 'date' => now(),
             ]);
         }
 
-        // Establecer descuento en 0 si no existe
         if (!$this->has('discount')) {
             $this->merge([
                 'discount' => 0,
             ]);
         }
 
-        // Establecer status inicial si no existe
         if (!$this->has('status')) {
             $this->merge([
                 'status' => 'pending',

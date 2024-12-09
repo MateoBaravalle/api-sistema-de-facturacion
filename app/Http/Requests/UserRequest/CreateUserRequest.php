@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\UserRequest;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CreateUserRequest extends FormRequest
@@ -25,13 +25,13 @@ class CreateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'required|string|max:255|unique:users,username|regex:/^[a-zA-Z0-9._-]+$/',
-            'name' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'phone' => 'nullable|string|max:20|regex:/^[0-9]+$/',
-            'role' => 'sometimes|exists:roles,name',
+            'username' => ['required', 'string', 'max:255', 'unique:users,username', 'regex:/^[a-zA-Z0-9._-]+$/'],
+            'name' => ['required', 'string', 'max:255'],
+            'lastname' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+            'role' => ['sometimes', 'exists:roles,name'],
         ];
     }
 
@@ -64,7 +64,7 @@ class CreateUserRequest extends FormRequest
     {
         if (!$this->has('role')) {
             $this->merge([
-                'role' => 'guest'
+                'role' => 'guest',
             ]);
         }
     }

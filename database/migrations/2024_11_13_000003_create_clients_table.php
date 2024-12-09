@@ -21,7 +21,6 @@ class CreateClientsTable extends Migration
             $table->string('province')->nullable();
             $table->decimal('credit_limit', 10, 2)->default(0);
             $table->decimal('balance', 10, 2)->default(0);
-            $table->enum('status', ['positive', 'current', 'negative']);
             $table->timestamps();
             $table->softDeletes();
         });

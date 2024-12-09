@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Discount extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'related_id',
+        'related_type',
         'name',
-        'percentage',
-        'fixed_amount',
         'discount_type',
-        'supplier_id',
+        'discount_value',
         'category',
-        'product_id',
-        'client_id',
         'start_date',
         'end_date',
         'min_purchase',
@@ -26,8 +26,7 @@ class Discount extends Model
     ];
 
     protected $casts = [
-        'percentage' => 'float',
-        'fixed_amount' => 'decimal:2',
+        'discount_value' => 'decimal:2',
         'min_purchase' => 'decimal:2',
         'is_active' => 'boolean',
         'is_accumulative' => 'boolean',
@@ -37,18 +36,49 @@ class Discount extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function supplier()
+    public function related(): MorphTo
     {
-        return $this->belongsTo(Supplier::class);
+        return $this->morphTo();
     }
 
-    public function product()
+    // Scopes
+    public function scopeActive($query): Builder
     {
-        return $this->belongsTo(Product::class);
+        return $query->where('is_active', true);
     }
 
-    public function client()
+    public function scopeInactive($query): Builder
     {
-        return $this->belongsTo(Client::class);
+        return $query->where('is_active', false);
+    }
+
+    public function scopeAccumulative($query): Builder
+    {
+        return $query->where('is_accumulative', true);
+    }
+
+    public function scopeNonAccumulative($query): Builder
+    {
+        return $query->where('is_accumulative', false);
+    }
+
+    public function scopeSuppliers($query): Builder
+    {
+        return $query->where('related_type', Supplier::class);
+    }
+
+    public function scopeClients($query): Builder
+    {
+        return $query->where('related_type', Client::class);
+    }
+
+    public function scopeCategory($query, $category): Builder
+    {
+        return $query->where('category', $category);
+    }
+
+    public function scopeProducts($query): Builder
+    {
+        return $query->where('related_type', Product::class);
     }
 }

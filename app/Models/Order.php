@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Order extends Model
 {
@@ -28,19 +31,19 @@ class Order extends Model
         'updated_at' => 'datetime',
     ];
 
-    public function reference()
+    public function reference(): MorphTo
     {
         return $this->morphTo();
     }
 
-    public function products()
+    public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class)
             ->using(OrderProduct::class)
             ->withPivot(['quantity', 'price', 'discount']);
     }
 
-    public function invoice()
+    public function invoice(): HasOne
     {
         return $this->hasOne(Invoice::class);
     }

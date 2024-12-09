@@ -20,7 +20,10 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         try {
-            $result = $this->authService->register($request->validated());
+            $data = $request->validated();
+            $data['role'] = 'admin'; // TODO: change to guest
+
+            $result = $this->authService->register($data);
 
             return $this->successResponse(
                 'Successfully registered',

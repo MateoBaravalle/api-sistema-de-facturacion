@@ -21,7 +21,7 @@ class UserController extends Controller
     {
         try {
             $users = $this->userService->getAllUsers($request->get('per_page', 10));
-            return $this->successResponse('Users retrieved successfully', ['users' => $users]);
+            return $this->successResponse('Users retrieved successfully', [...$users]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -31,7 +31,7 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->getUserById($id);
-            return $this->successResponse('User retrieved successfully', ['user' => $user]);
+            return $this->successResponse('User retrieved successfully', [$user]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -41,7 +41,7 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->createUser($request->validated());
-            return $this->successResponse('User created successfully', ['user' => $user], 201);
+            return $this->successResponse('User created successfully', [$user], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -51,7 +51,7 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->updateUser($id, $request->validated());
-            return $this->successResponse('User updated successfully', ['user' => $user]);
+            return $this->successResponse('User updated successfully', [$user]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

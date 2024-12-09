@@ -55,6 +55,11 @@ class Client extends Model
         return $this->hasMany(Invoice::class);
     }
 
+    public function discounts(): MorphMany
+    {
+        return $this->morphMany(Discount::class, 'related');
+    }
+
     // Scopes
     public function scopeActive($query): Builder
     {

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Supplier extends Model
@@ -32,18 +34,23 @@ class Supplier extends Model
         'deleted_at' => 'datetime',
     ];
 
-    public function transactions()
+    public function transactions(): MorphMany
     {
         return $this->morphMany(Transaction::class, 'reference');
     }
 
-    public function orders()
+    public function orders(): MorphMany
     {
         return $this->morphMany(Order::class, 'reference');
     }
 
-    public function products()
+    public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function discounts(): MorphMany
+    {
+        return $this->morphMany(Discount::class, 'related');
     }
 }

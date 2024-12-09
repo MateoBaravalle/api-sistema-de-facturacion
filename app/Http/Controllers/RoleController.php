@@ -20,7 +20,7 @@ class RoleController extends Controller
         try {
             $perPage = $request->get('per_page', 10);
             $roles = $this->roleService->getAllRoles($perPage);
-            return $this->successResponse('Roles retrieved successfully', ['roles' => $roles]);
+            return $this->successResponse('Roles retrieved successfully', [...$roles]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

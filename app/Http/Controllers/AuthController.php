@@ -39,7 +39,7 @@ class AuthController extends Controller
     {
         try {
             $token = $this->authService->login($request->validated());
-            return $this->successResponse('Successfully logged in', ['token' => $token]);
+            return $this->successResponse('Successfully logged in', [$token]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -59,7 +59,7 @@ class AuthController extends Controller
     {
         try {
             $newToken = $this->authService->refresh($request->bearerToken());
-            return $this->successResponse('Token refreshed', ['token' => $newToken]);
+            return $this->successResponse('Token refreshed', [$newToken]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

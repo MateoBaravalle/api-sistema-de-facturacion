@@ -19,7 +19,7 @@ class Controller extends BaseController
 
     protected function successResponse(
         string $message,
-        array $data = [],
+        array $data = null,
         int $code = 200
     ): JsonResponse {
         $response = [
@@ -27,7 +27,7 @@ class Controller extends BaseController
             'message' => $message,
         ];
         
-        if (!empty($data)) {
+        if ($data) {
             $response['data'] = $data;
         }
         

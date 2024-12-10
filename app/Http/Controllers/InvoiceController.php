@@ -20,9 +20,10 @@ class InvoiceController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
-            $invoices = $this->invoiceService->getAllInvoices($perPage);
-            return $this->successResponse('Invoices retrieved successfully', [...$invoices]);
+            $invoices = $this->invoiceService->getAllInvoices($page, $perPage);
+            return $this->successResponse('Invoices retrieved successfully', ['invoices' => $invoices]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -32,7 +33,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoices = $this->invoiceService->getInvoicesByClient($id);
-            return $this->successResponse('Invoices retrieved successfully', [...$invoices]);
+            return $this->successResponse('Invoices retrieved successfully', ['invoices' => $invoices]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -43,7 +44,7 @@ class InvoiceController extends Controller
         try {
             $status = $request->get('status');
             $invoices = $this->invoiceService->getInvoicesByStatus($status);
-            return $this->successResponse('Invoices retrieved successfully', [...$invoices]);
+            return $this->successResponse('Invoices retrieved successfully', ['invoices' => $invoices]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -53,7 +54,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoices = $this->invoiceService->getMyInvoices();
-            return $this->successResponse('Invoices retrieved successfully', [...$invoices]);
+            return $this->successResponse('Invoices retrieved successfully', ['invoices' => $invoices]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -63,7 +64,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = $this->invoiceService->getInvoiceById($id);
-            return $this->successResponse('Invoice retrieved successfully', [$invoice]);
+            return $this->successResponse('Invoice retrieved successfully', ['invoice' => $invoice]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -73,7 +74,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = $this->invoiceService->createInvoice($request->validated());
-            return $this->successResponse('Invoice created successfully', [$invoice], 201);
+            return $this->successResponse('Invoice created successfully', ['invoice' => $invoice], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -83,7 +84,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = $this->invoiceService->updateInvoice($id, $request->validated());
-            return $this->successResponse('Invoice updated successfully', [$invoice]);
+            return $this->successResponse('Invoice updated successfully', ['invoice' => $invoice]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

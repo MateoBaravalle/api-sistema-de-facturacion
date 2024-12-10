@@ -24,10 +24,10 @@ abstract class Service
         return $this->model->create($data);
     }
 
-    protected function getAll(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    protected function getAll(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return $this->remember(
-            $this->getCacheKey('all'),
+            $this->getCacheKey('all', $page),
             fn () => $this->paginate(
                 $this->model->query(),
                 $perPage
@@ -84,6 +84,15 @@ abstract class Service
         foreach ($types as $type) {
             $this->forget($this->getCacheKey($type, $id));
         }
+        // Get the total number of pages from the latest paginator instance
+        $query = $this->model->query();
+        $paginator = $query->paginate(self::DEFAULT_PER_PAGE);
+        $lastPage = $paginator->lastPage();
+
+        // Clear cache for all pages
+        for ($page = 1; $page <= $lastPage; $page++) {
+            $this->forget($this->getCacheKey('all', $page));
+        }
     }
 
     /**
@@ -123,8 +132,8 @@ abstract class Service
         return $query->orderBy($orderBy, $direction);
     }
 
-    protected function paginate(Builder $query, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    protected function paginate(Builder $query, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $query->paginate($perPage);
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 }

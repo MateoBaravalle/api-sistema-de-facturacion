@@ -20,8 +20,10 @@ class UserController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $users = $this->userService->getAllUsers($request->get('per_page', 10));
-            return $this->successResponse('Users retrieved successfully', [...$users]);
+            $page = $request->get('page', 1);
+            $perPage = $request->get('per_page', 10);
+            $users = $this->userService->getAllUsers($page, $perPage);
+            return $this->successResponse('Users retrieved successfully', ['users' => $users]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -31,7 +33,7 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->getUserById($id);
-            return $this->successResponse('User retrieved successfully', [$user]);
+            return $this->successResponse('User retrieved successfully', ['user' => $user]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -41,7 +43,7 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->createUser($request->validated());
-            return $this->successResponse('User created successfully', [$user], 201);
+            return $this->successResponse('User created successfully', ['user' => $user], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -51,7 +53,7 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->updateUser($id, $request->validated());
-            return $this->successResponse('User updated successfully', [$user]);
+            return $this->successResponse('User updated successfully', ['user' => $user]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

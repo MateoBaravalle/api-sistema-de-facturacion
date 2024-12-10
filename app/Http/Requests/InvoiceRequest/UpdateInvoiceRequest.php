@@ -49,7 +49,6 @@ class UpdateInvoiceRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        // Recalcular total si se modifica subtotal o descuento
         if (($this->has('subtotal') || $this->has('discount')) && !$this->has('total')) {
             $invoice = $this->route('invoice');
             $subtotal = $this->input('subtotal', $invoice->subtotal);

@@ -20,9 +20,10 @@ class ClientController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
-            $clients = $this->clientService->getAllClients($perPage);
-            return $this->successResponse('Clients retrieved successfully', [...$clients]);
+            $clients = $this->clientService->getAllClients($page, $perPage);
+            return $this->successResponse('Clients retrieved successfully', ['clients' => $clients]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -32,7 +33,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->getClientById($id);
-            return $this->successResponse('Client retrieved successfully', [$client]);
+            return $this->successResponse('Client retrieved successfully', ['client' => $client]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -42,7 +43,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->createClient($request->validated());
-            return $this->successResponse('Client created successfully', [$client], 201);
+            return $this->successResponse('Client created successfully', ['client' => $client], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -52,7 +53,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->updateClient($id, $request->validated());
-            return $this->successResponse('Client updated successfully', [$client]);
+            return $this->successResponse('Client updated successfully', ['client' => $client]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

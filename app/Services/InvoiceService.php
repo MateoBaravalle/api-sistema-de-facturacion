@@ -15,12 +15,9 @@ class InvoiceService extends Service
         parent::__construct($invoice, self::MODEL);
     }
 
-    public function getAllInvoices(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllInvoices(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->remember(
-            $this->getCacheKey('all'),
-            fn () => $this->paginate($this->model->query(), $perPage)
-        );
+        return $this->getAll($page, $perPage);
     }
 
     public function getInvoiceById(int $id): Invoice

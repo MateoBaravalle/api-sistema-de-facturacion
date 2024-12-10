@@ -20,9 +20,10 @@ class TransactionController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
-            $transactions = $this->transactionService->getAllTransactions($perPage);
-            return $this->successResponse('Transactions retrieved successfully', [...$transactions]);
+            $transactions = $this->transactionService->getAllTransactions($page, $perPage);
+            return $this->successResponse('Transactions retrieved successfully', ['transactions' => $transactions]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -32,7 +33,7 @@ class TransactionController extends Controller
     {
         try {
             $transactions = $this->transactionService->getTransactionByClient($clientId);
-            return $this->successResponse('Transactions retrieved successfully', [...$transactions]);
+            return $this->successResponse('Transactions retrieved successfully', ['transactions' => $transactions]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -48,7 +49,7 @@ class TransactionController extends Controller
             }
 
             $transactions = $this->transactionService->getTransactionsByStatus($status);
-            return $this->successResponse("{$status} transactions retrieved successfully", [...$transactions]);
+            return $this->successResponse("{$status} transactions retrieved successfully", ['transactions' => $transactions]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -63,7 +64,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = $this->transactionService->getTransactionById($id);
-            return $this->successResponse('Transaction retrieved successfully', [$transaction]);
+            return $this->successResponse('Transaction retrieved successfully', ['transaction' => $transaction]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -73,7 +74,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = $this->transactionService->getMyTransactionById($id);
-            return $this->successResponse('Transaction retrieved successfully', [$transaction]);
+            return $this->successResponse('Transaction retrieved successfully', ['transaction' => $transaction]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -83,7 +84,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = $this->transactionService->createTransaction($request->validated());
-            return $this->successResponse('Transaction created successfully', [$transaction], 201);
+            return $this->successResponse('Transaction created successfully', ['transaction' => $transaction], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -93,7 +94,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = $this->transactionService->updateTransaction($id, $request->validated());
-            return $this->successResponse('Transaction updated successfully', [$transaction]);
+            return $this->successResponse('Transaction updated successfully', ['transaction' => $transaction]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -113,7 +114,7 @@ class TransactionController extends Controller
     {
         try {
             $average = $this->transactionService->getAverageTransactionAmount($clientId);
-            return $this->successResponse('Average transaction amount retrieved successfully', [$average]);
+            return $this->successResponse('Average transaction amount retrieved successfully', ['average' => $average]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

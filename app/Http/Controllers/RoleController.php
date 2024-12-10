@@ -37,7 +37,7 @@ class RoleController extends Controller
             $assigned = $this->roleService->assignRoleToUser($roleId, $validated['user_id']);
             return $this->successResponse(
                 $assigned ? 'Role assigned successfully' : 'Role was already assigned',
-                ['role' => $assigned]
+                ['assigned' => $assigned]
             );
         } catch (\Exception $e) {
             return $this->handleException($e);

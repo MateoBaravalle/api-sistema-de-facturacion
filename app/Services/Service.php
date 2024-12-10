@@ -84,12 +84,14 @@ abstract class Service
         foreach ($types as $type) {
             $this->forget($this->getCacheKey($type, $id));
         }
+        // Get the total number of pages from the latest paginator instance
+        $query = $this->model->query();
+        $paginator = $query->paginate(self::DEFAULT_PER_PAGE);
+        $lastPage = $paginator->lastPage();
 
-        $page = 10;
-
-        while ($page > 1) {
+        // Clear cache for all pages
+        for ($page = 1; $page <= $lastPage; $page++) {
             $this->forget($this->getCacheKey('all', $page));
-            $page--;
         }
     }
 

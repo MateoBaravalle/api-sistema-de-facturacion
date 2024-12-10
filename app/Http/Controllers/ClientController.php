@@ -107,6 +107,12 @@ class ClientController extends Controller
             throw new AuthorizationException('Cliente no encontrado');
         }
         
-        return $this->update($request, $client->id);
+        $validated = $request->validated();
+        unset($validated['credit_limit']);
+        
+        $newRequest = UpdateClientRequest::createFrom($request);
+        $newRequest->replace($validated);
+        
+        return $this->update($newRequest, $client->id);
     }
 }

@@ -21,7 +21,7 @@ class RoleController extends Controller
             $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
             $roles = $this->roleService->getAllRoles($page, $perPage);
-            return $this->successResponse('Roles retrieved successfully', ['roles' => $roles]);
+            return $this->successResponse('Roles recuperados', ['roles' => $roles]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -36,7 +36,7 @@ class RoleController extends Controller
 
             $assigned = $this->roleService->assignRoleToUser($roleId, $validated['user_id']);
             return $this->successResponse(
-                $assigned ? 'Role assigned successfully' : 'Role was already assigned',
+                $assigned ? 'Role asignado' : 'Role ya asignado',
                 ['assigned' => $assigned]
             );
         } catch (\Exception $e) {

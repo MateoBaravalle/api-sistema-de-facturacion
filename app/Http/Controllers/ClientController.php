@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClientRequest\StoreClientRequest;
 use App\Http\Requests\ClientRequest\UpdateClientRequest;
 use App\Services\ClientService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -22,8 +23,9 @@ class ClientController extends Controller
         try {
             $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
+            
             $clients = $this->clientService->getAllClients($page, $perPage);
-            return $this->successResponse('Clients retrieved successfully', ['clients' => $clients]);
+            return $this->successResponse('Clientes recuperados', ['clients' => $clients]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -33,7 +35,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->getClientById($id);
-            return $this->successResponse('Client retrieved successfully', ['client' => $client]);
+            return $this->successResponse('Cliente recuperado', ['client' => $client]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -43,7 +45,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->createClient($request->validated());
-            return $this->successResponse('Client created successfully', ['client' => $client], 201);
+            return $this->successResponse('Cliente creado', ['client' => $client], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -53,7 +55,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->updateClient($id, $request->validated());
-            return $this->successResponse('Client updated successfully', ['client' => $client]);
+            return $this->successResponse('Cliente actualizado', ['client' => $client]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -63,7 +65,7 @@ class ClientController extends Controller
     {
         try {
             $this->clientService->deleteClient($id);
-            return $this->successResponse('Client deleted successfully');
+            return $this->successResponse('Cliente eliminado');
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -71,11 +73,23 @@ class ClientController extends Controller
 
     public function showProfile(): JsonResponse
     {
-        return $this->show(auth()->id());
+        $clientId = auth()->user()->client->id;
+
+        if (!$clientId) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+        
+        return $this->show($clientId);
     }
 
     public function updateProfile(UpdateClientRequest $request): JsonResponse
     {
-        return $this->update($request, auth()->id());
+        $clientId = auth()->user()->client->id;
+        
+        if (!$clientId) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+        
+        return $this->update($request, $clientId);
     }
 }

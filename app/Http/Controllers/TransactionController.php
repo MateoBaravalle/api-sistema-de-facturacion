@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TransactionRequest\StoreTransactionRequest;
 use App\Http\Requests\TransactionRequest\UpdateTransactionRequest;
 use App\Services\TransactionService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,19 +21,22 @@ class TransactionController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
-            $transactions = $this->transactionService->getAllTransactions($perPage);
-            return $this->successResponse('Transactions retrieved successfully', [...$transactions]);
+            $transactions = $this->transactionService->getAllTransactions($page, $perPage);
+            return $this->successResponse('Transacciones recuperadas', ['transacciones' => $transactions]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
     }
 
-    public function getByClient(int $clientId): JsonResponse
+    public function getByClient(int $clientId, Request $request): JsonResponse
     {
         try {
-            $transactions = $this->transactionService->getTransactionByClient($clientId);
-            return $this->successResponse('Transactions retrieved successfully', [...$transactions]);
+            $page = $request->get('page', 1);
+            $perPage = $request->get('per_page', 10);
+            $transactions = $this->transactionService->getTransactionByClient($clientId, $page, $perPage);
+            return $this->successResponse('Transacciones recuperadas', ['transacciones' => $transactions]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -42,28 +46,36 @@ class TransactionController extends Controller
     {
         try {
             $status = $request->get('status');
+            $page = $request->get('page', 1);
+            $perPage = $request->get('per_page', 10);
 
             if (!$status) {
-                throw new \InvalidArgumentException('Status is required');
+                throw new \InvalidArgumentException('El status es requerido');
             }
 
-            $transactions = $this->transactionService->getTransactionsByStatus($status);
-            return $this->successResponse("{$status} transactions retrieved successfully", [...$transactions]);
+            $transactions = $this->transactionService->getTransactionsByStatus($status, $page, $perPage);
+            return $this->successResponse("{$status} transacciones recuperadas", ['transactions' => $transactions]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
     }
 
-    public function getMyTransactions(): JsonResponse
+    public function getMyTransactions(Request $request): JsonResponse
     {
-        return $this->getByClient(auth()->user()->client->id);
+        $client = auth()->user()->client;
+     
+        if (!$client) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+     
+        return $this->getByClient($client->id, $request);
     }
 
     public function show(int $id): JsonResponse
     {
         try {
             $transaction = $this->transactionService->getTransactionById($id);
-            return $this->successResponse('Transaction retrieved successfully', [$transaction]);
+            return $this->successResponse('Transacción recuperada', ['transaction' => $transaction]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -73,7 +85,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = $this->transactionService->getMyTransactionById($id);
-            return $this->successResponse('Transaction retrieved successfully', [$transaction]);
+            return $this->successResponse('Transacción recuperada', ['transaction' => $transaction]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -83,7 +95,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = $this->transactionService->createTransaction($request->validated());
-            return $this->successResponse('Transaction created successfully', [$transaction], 201);
+            return $this->successResponse('Transacción creada', ['transaction' => $transaction], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -93,7 +105,7 @@ class TransactionController extends Controller
     {
         try {
             $transaction = $this->transactionService->updateTransaction($id, $request->validated());
-            return $this->successResponse('Transaction updated successfully', [$transaction]);
+            return $this->successResponse('Transacción actualizada', ['transaction' => $transaction]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -103,7 +115,7 @@ class TransactionController extends Controller
     {
         try {
             $this->transactionService->deleteTransaction($id);
-            return $this->successResponse('Transaction deleted successfully');
+            return $this->successResponse('Transacción eliminada');
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -113,7 +125,7 @@ class TransactionController extends Controller
     {
         try {
             $average = $this->transactionService->getAverageTransactionAmount($clientId);
-            return $this->successResponse('Average transaction amount retrieved successfully', [$average]);
+            return $this->successResponse('Promedio de transacción recuperado', ['average' => $average]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

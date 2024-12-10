@@ -19,9 +19,10 @@ class RegisterRequest extends FormRequest
     /**
      * Handle a failed validation attempt.
      *
+     * @param Validator $validator The validator instance containing the validation errors.
      * @throws HttpResponseException
      */
-    protected function failedValidation(Validator $validator): never
+    protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
             'message' => 'Validation failed',
@@ -37,12 +38,12 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'required|string|max:255|unique:users,username|regex:/^[a-zA-Z0-9._-]+$/',
-            'name' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'phone' => 'sometimes|string|max:20|regex:/^[0-9]+$/',
+            'username' => ['required', 'string', 'max:255', 'unique:users,username', 'regex:/^[a-zA-Z0-9._-]+$/'],
+            'name' => ['required', 'string', 'max:255'],
+            'lastname' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+            'phone' => ['sometimes', 'string', 'max:20', 'regex:/^[0-9]+$/'],
         ];
     }
 

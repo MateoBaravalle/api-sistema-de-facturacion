@@ -26,7 +26,6 @@ class AuthService
     {
         $user = $this->userService->createUser($data);
         return [
-            'user' => $user,
             'token' => JWTAuth::fromUser($user),
         ];
     }

@@ -44,28 +44,25 @@ class StoreInvoiceRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
-            'message' => 'Validation failed',
+            'message' => 'Validación fallida',
             'error' => $validator->errors(),
         ], 422));
     }
 
     protected function prepareForValidation()
     {
-        // Establecer fecha actual si no existe
         if (!$this->has('date')) {
             $this->merge([
                 'date' => now(),
             ]);
         }
 
-        // Establecer descuento en 0 si no existe
         if (!$this->has('discount')) {
             $this->merge([
                 'discount' => 0,
             ]);
         }
 
-        // Establecer status inicial si no existe
         if (!$this->has('status')) {
             $this->merge([
                 'status' => 'pending',

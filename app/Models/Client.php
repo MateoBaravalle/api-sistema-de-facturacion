@@ -24,6 +24,7 @@ class Client extends Model
         'province',
         'credit_limit',
         'balance',
+        'user_id',
     ];
 
     protected $casts = [

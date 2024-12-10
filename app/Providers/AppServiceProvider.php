@@ -26,7 +26,16 @@ class AppServiceProvider extends ServiceProvider
     {
         Relation::morphMap([
             'clients' => 'App\Models\Client',
-            'supplier' => 'App\Models\Supplier',
+            'discounts' => 'App\Models\Discount',
+            'invoices' => 'App\Models\Invoice',
+            'notifications' => 'App\Models\Notification',
+            'orders' => 'App\Models\Order',
+            'payments' => 'App\Models\Payment',
+            'products' => 'App\Models\Product',
+            'roles' => 'Spatie\Permission\Models\Role',
+            'suppliers' => 'App\Models\Supplier',
+            'transactions' => 'App\Models\Transaction',
+            'users' => 'App\Models\User',
         ]);
     }
 }

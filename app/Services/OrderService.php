@@ -15,9 +15,9 @@ class OrderService extends Service
         parent::__construct($order, self::MODEL);
     }
 
-    public function getAllOrders(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllOrders(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->getAll($perPage);
+        return $this->getAll($page, $perPage);
     }
     
     public function getOrderById(int $id): Order
@@ -25,41 +25,54 @@ class OrderService extends Service
         return $this->getByIdWith($id, ['products', 'invoice']);
     }
 
-    public function getOrdersByClient(int $clientId, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getOrdersByClient(int $clientId, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        $cacheKey = $this->getCacheKey("client_id.{$clientId}");
-        return $this->remember(
-            $cacheKey,
-            fn () => $this->paginate(
-                $this->model->with('products', 'invoice')->where('client_id', $clientId),
-                $perPage
-            )
+        // $cacheKey = $this->getCacheKey('client', $clientId . $page . $perPage);
+        // return $this->remember(
+        //     $cacheKey,
+        //     fn () => $this->paginate(
+        //         $this->model->with('products', 'invoice')->where('client_id', $clientId),
+        //         $page,
+        //         $perPage
+        //     )
+        // );
+        return $this->paginate(
+            $this->model->with('products', 'invoice')->where('client_id', $clientId),
+            $page,
+            $perPage
         );
     }
 
-    public function getOrdersByStatus(string $status, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getOrdersByStatus(string $status, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        $cacheKey = $this->getCacheKey("status.{$status}");
-        return $this->remember(
-            $cacheKey,
-            fn () => $this->paginate(
-                $this->model->where('status', $status),
-                $perPage
-            )
+        // $cacheKey = $this->getCacheKey('status', $status . $page . $perPage);
+        // return $this->remember(
+        //     $cacheKey,
+        //     fn () => $this->paginate(
+        //         $this->model->where('status', $status),
+        //         $page,
+        //         $perPage
+        //     )
+        // );
+        return $this->paginate(
+            $this->model->where('status', $status),
+            $page,
+            $perPage
         );
     }
 
     public function getMyOrderById(int $orderId): Order
     {
         if (!$this->belongsToClient($orderId)) {
-            throw new AuthorizationException('Order does not belong to the current client');
+            throw new AuthorizationException('La orden no pertenece al cliente actual');
         }
 
-        $cacheKey = $this->getCacheKey("id.{$orderId}");
-        return $this->remember(
-            $cacheKey,
-            fn () => $this->getOrderById($orderId)
-        );
+        // $cacheKey = $this->getCacheKey('id', $orderId);
+        // return $this->remember(
+        //     $cacheKey,
+        //     fn () => $this->getOrderById($orderId)
+        // );
+        return $this->getOrderById($orderId);
     }
 
     public function createOrder(array $data): Order
@@ -70,15 +83,20 @@ class OrderService extends Service
         $order = $this->create($data);
         $order->products()->attach($products);
 
-        $this->clearModelCache($order->id, [self::MODEL]);
+        // $this->clearModelCache($order->id, [self::MODEL]);
 
         return $order->load('products');
     }
 
     public function createMyOrder(array $data): Order
     {
-        $clientId = auth()->user()->client->id;
-        $data['client_id'] = $clientId;
+        $client = auth()->user()->client;
+
+        if (!$client) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+
+        $data['client_id'] = $client->id;
         
         return $this->createOrder($data);
     }
@@ -88,11 +106,11 @@ class OrderService extends Service
         $order = $this->getById($id);
         $order->update($data);
         
-        $this->clearModelCacheWithSuffixes(
-            $id,
-            ['order', 'client', 'order'],
-            ['pending', 'completed']
-        );
+        // $this->clearModelCacheWithSuffixes(
+        //     $id,
+        //     ['order', 'client', 'order'],
+        //     ['pending', 'completed']
+        // );
         
         return $order->fresh();
     }
@@ -100,7 +118,7 @@ class OrderService extends Service
     public function updateMyOrder(int $id, array $data): Order
     {
         if (!$this->belongsToClient($id)) {
-            throw new AuthorizationException('Order does not belong to the current client');
+            throw new AuthorizationException('La orden no pertenece al cliente actual');
         }
 
         $order = $this->getById($id);
@@ -112,13 +130,13 @@ class OrderService extends Service
     {
         $deleted = $this->getById($id)->delete();
 
-        if ($deleted) {
-            $this->clearModelCacheWithSuffixes(
-                $id,
-                ['order', 'client', 'order'],
-                ['pending', 'completed']
-            );
-        }
+        // if ($deleted) {
+        //     $this->clearModelCacheWithSuffixes(
+        //         $id,
+        //         ['order', 'client', 'order'],
+        //         ['pending', 'completed']
+        //     );
+        // }
 
         return $deleted;
     }

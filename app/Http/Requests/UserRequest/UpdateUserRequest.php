@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\UserRequest;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateUserRequest extends FormRequest
@@ -16,7 +16,7 @@ class UpdateUserRequest extends FormRequest
     protected function failedValidation(Validator $validator): never
     {
         throw new HttpResponseException(response()->json([
-            'message' => 'Validation failed',
+            'message' => 'Validación fallida',
             'error' => $validator->errors(),
         ], 422));
     }
@@ -26,13 +26,13 @@ class UpdateUserRequest extends FormRequest
         $userId = $this->route('user');
         
         return [
-            'username' => "sometimes|string|max:255|unique:users,username,{$userId}|regex:/^[a-zA-Z0-9._-]+$/",
-            'name' => 'sometimes|string|max:255',
-            'lastname' => 'sometimes|string|max:255',
-            'email' => "sometimes|email|unique:users,email,{$userId}",
-            'password' => 'sometimes|string|min:6',
-            'phone' => 'nullable|string|max:20|regex:/^[0-9]+$/',
-            'role' => 'sometimes|exists:roles,name',
+            'username' => ['sometimes', 'string', 'max:255', 'unique:users,username,' . $userId, 'regex:/^[a-zA-Z0-9._-]+$/'],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'lastname' => ['sometimes', 'string', 'max:255'],
+            'email' => ['sometimes', 'email', 'unique:users,email,' . $userId],
+            'password' => ['sometimes', 'string', 'min:6'],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+            'role' => ['sometimes', 'exists:roles,name'],
         ];
     }
 

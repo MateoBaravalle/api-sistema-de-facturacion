@@ -16,7 +16,7 @@ class StoreOrderRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
-            'message' => 'Validation failed',
+            'message' => 'Validación fallida',
             'error' => $validator->errors(),
         ], 422));
     }
@@ -24,17 +24,17 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'reference_type' => 'required|string|in:client,supplier',
-            'reference_id' => 'required|integer',
-            'order_date' => 'required|date',
-            'discount' => 'sometimes|numeric|min:0|nullable:false',
-            'total_amount' => 'required|numeric|min:0',
-            'notes' => 'nullable|string',
-            'products' => 'required|array|min:1',
-            'products.*.product_id' => 'required|exists:products,id',
-            'products.*.quantity' => 'required|integer|min:1',
-            'products.*.price' => 'required|numeric|min:0',
-            'products.*.discount' => 'sometimes|numeric|min:0|nullable:false',
+            'reference_type' => ['required', 'string', 'in:client,supplier'],
+            'reference_id' => ['required', 'integer'],
+            'order_date' => ['required', 'date'],
+            'discount' => ['sometimes', 'numeric', 'min:0'],
+            'total_amount' => ['required', 'numeric', 'min:0'],
+            'notes' => ['nullable', 'string'],
+            'products' => ['required', 'array', 'min:1'],
+            'products.*.product_id' => ['required', 'exists:products,id'],
+            'products.*.quantity' => ['required', 'integer', 'min:1'],
+            'products.*.price' => ['required', 'numeric', 'min:0'],
+            'products.*.discount' => ['sometimes', 'numeric', 'min:0'],
         ];
     }
 

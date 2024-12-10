@@ -16,7 +16,7 @@ class StoreTransactionRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
-            'message' => 'Validation failed',
+            'message' => 'Validación fallida',
             'error' => $validator->errors(),
         ], 422));
     }
@@ -57,7 +57,7 @@ class StoreTransactionRequest extends FormRequest
     {
         if (!$this->has('status')) {
             $this->merge([
-                'status' => 'pending'
+                'status' => 'pending',
             ]);
         }
     }

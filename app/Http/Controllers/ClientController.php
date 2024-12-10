@@ -71,6 +71,21 @@ class ClientController extends Controller
         }
     }
 
+    public function storeProfile(StoreClientRequest $request): JsonResponse
+    {
+        try {
+            $validated = $request->validated();
+
+            $userId = auth()->user()->id;
+            $validated['user_id'] = $userId;
+
+            $client = $this->clientService->createClient($validated);
+            return $this->successResponse('Cliente creado', ['client' => $client], 201);
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
+    }
+
     public function showProfile(): JsonResponse
     {
         $client = auth()->user()->client;
@@ -93,4 +108,3 @@ class ClientController extends Controller
         return $this->update($request, $client->id);
     }
 }
-

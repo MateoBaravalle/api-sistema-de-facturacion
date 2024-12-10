@@ -40,6 +40,7 @@ Route::group(['middleware' => 'api'], function () {
         Route::group(['middleware' => 'role:client'], function () {
 
             Route::get('/client/me', [ClientController::class, 'showProfile']); // Vista del perfil del cliente
+            Route::post('/client/me', [ClientController::class, 'storeProfile']); // Crear un cliente para el usuario
             Route::put('/client/me', [ClientController::class, 'updateProfile']); // Actualizar el perfil del cliente
             
             Route::post('/order/me', [OrderController::class, 'storeMyOrder']); // Generar un pedido

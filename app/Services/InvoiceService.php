@@ -27,27 +27,37 @@ class InvoiceService extends Service
 
     public function getInvoicesByClient(int $clientId, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        $cacheKey = $this->getCacheKey('client', $clientId . $page . $perPage);
-        return $this->remember(
-            $cacheKey,
-            fn () => $this->paginate(
-                $this->model->where('client_id', $clientId),
-                $page,
-                $perPage
-            )
+        // $cacheKey = $this->getCacheKey('client', $clientId . $page . $perPage);
+        // return $this->remember(
+        //     $cacheKey,
+        //     fn () => $this->paginate(
+        //         $this->model->where('client_id', $clientId),
+        //         $page,
+        //         $perPage
+        //     )
+        // );
+        return $this->paginate(
+            $this->model->where('client_id', $clientId),
+            $page,
+            $perPage
         );
     }
 
     public function getInvoicesByStatus(string $status, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        $cacheKey = $this->getCacheKey('status', $status . $page . $perPage);
-        return $this->remember(
-            $cacheKey,
-            fn () => $this->paginate(
-                $this->model->where('status', $status),
-                $page,
-                $perPage
-            )
+        // $cacheKey = $this->getCacheKey('status', $status . $page . $perPage);
+        // return $this->remember(
+        //     $cacheKey,
+        //     fn () => $this->paginate(
+        //         $this->model->where('status', $status),
+        //         $page,
+        //         $perPage
+        //     )
+        // );
+        return $this->paginate(
+            $this->model->where('status', $status),
+            $page,
+            $perPage
         );
     }
 

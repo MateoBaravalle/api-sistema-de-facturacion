@@ -70,15 +70,14 @@ abstract class Service
 
     protected function belongsToClient(int $id): bool
     {
-        $clientId = auth()->user()->client->id;
-        $query = $this->model->where('id', $id)
-            ->where('client_id', $clientId);
+        $client = auth()->user()->client;
+        $query = $this->model->where('id', $id);
 
-        if (!$clientId) {
+        if (!$client) {
             throw new AuthorizationException('Cliente no encontrado');
         }
-        
-        return $query->exists();
+
+        return $query->where('client_id', $client->id)->exists();
     }
 
     protected function remember(string $key, callable $callback): mixed

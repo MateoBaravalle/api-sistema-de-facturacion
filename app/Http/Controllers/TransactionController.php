@@ -62,13 +62,13 @@ class TransactionController extends Controller
 
     public function getMyTransactions(Request $request): JsonResponse
     {
-        $clientId = auth()->user()->client->id;
+        $client = auth()->user()->client;
      
-        if (!$clientId) {
+        if (!$client) {
             throw new AuthorizationException('Cliente no encontrado');
         }
      
-        return $this->getByClient($clientId, $request);
+        return $this->getByClient($client->id, $request);
     }
 
     public function show(int $id): JsonResponse

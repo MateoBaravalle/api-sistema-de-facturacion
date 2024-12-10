@@ -73,23 +73,24 @@ class ClientController extends Controller
 
     public function showProfile(): JsonResponse
     {
-        $clientId = auth()->user()->client->id;
+        $client = auth()->user()->client;
 
-        if (!$clientId) {
+        if (!$client) {
             throw new AuthorizationException('Cliente no encontrado');
         }
-        
-        return $this->show($clientId);
+
+        return $this->show($client->id);
     }
 
     public function updateProfile(UpdateClientRequest $request): JsonResponse
     {
-        $clientId = auth()->user()->client->id;
+        $client = auth()->user()->client;
         
-        if (!$clientId) {
+        if (!$client) {
             throw new AuthorizationException('Cliente no encontrado');
         }
         
-        return $this->update($request, $clientId);
+        return $this->update($request, $client->id);
     }
 }
+

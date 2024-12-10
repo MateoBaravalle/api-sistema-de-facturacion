@@ -90,13 +90,13 @@ class OrderService extends Service
 
     public function createMyOrder(array $data): Order
     {
-        $clientId = auth()->user()->client->id;
+        $client = auth()->user()->client;
 
-        if (!$clientId) {
+        if (!$client) {
             throw new AuthorizationException('Cliente no encontrado');
         }
 
-        $data['client_id'] = $clientId;
+        $data['client_id'] = $client->id;
         
         return $this->createOrder($data);
     }

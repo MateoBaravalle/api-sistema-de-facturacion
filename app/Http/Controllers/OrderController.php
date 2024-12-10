@@ -43,13 +43,13 @@ class OrderController extends Controller
 
     public function getMyOrders(): JsonResponse
     {
-        $clientId = auth()->user()->client->id;
+        $client = auth()->user()->client;
 
-        if (!$clientId) {
+        if (!$client) {
             throw new AuthorizationException('Cliente no encontrado');
         }
 
-        return $this->getByClient($clientId);
+        return $this->getByClient($client->id);
     }
 
     public function show(int $id): JsonResponse

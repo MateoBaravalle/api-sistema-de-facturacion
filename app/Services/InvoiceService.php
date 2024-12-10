@@ -53,13 +53,13 @@ class InvoiceService extends Service
 
     public function getMyInvoices(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        $clientId = auth()->user()->client->id;
+        $client = auth()->user()->client;
 
-        if (!$clientId) {
+        if (!$client) {
             throw new AuthorizationException('Cliente no encontrado');
         }
 
-        return $this->getInvoicesByClient($clientId, $page, $perPage);
+        return $this->getInvoicesByClient($client->id, $page, $perPage);
     }
 
     public function getMyInvoiceById(int $invoiceId): Invoice

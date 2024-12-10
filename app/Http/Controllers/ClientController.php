@@ -74,10 +74,12 @@ class ClientController extends Controller
     public function storeProfile(StoreClientRequest $request): JsonResponse
     {
         try {
-            $validated = $request->validated();
+            if (auth()->user()->client) {
+                return $this->errorResponse('El usuario ya tiene un cliente asociado', 422);
+            }
 
-            $userId = auth()->user()->id;
-            $validated['user_id'] = $userId;
+            $validated = $request->validated();
+            $validated['user_id'] = auth()->user()->id;
 
             $client = $this->clientService->createClient($validated);
             return $this->successResponse('Cliente creado', ['client' => $client], 201);

@@ -16,10 +16,7 @@ class ClientService extends Service
 
     public function getAllClients(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->remember(
-            $this->getCacheKey('all', $page),
-            fn () => $this->paginate($this->model->query(), $page, $perPage)
-        );
+        return $this->getAll($page, $perPage);
     }
 
     public function getClientById(int $id): Client

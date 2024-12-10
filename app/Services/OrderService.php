@@ -15,9 +15,9 @@ class OrderService extends Service
         parent::__construct($order, self::MODEL);
     }
 
-    public function getAllOrders(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllOrders(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->getAll($perPage);
+        return $this->getAll($page, $perPage);
     }
     
     public function getOrderById(int $id): Order

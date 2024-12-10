@@ -24,10 +24,10 @@ abstract class Service
         return $this->model->create($data);
     }
 
-    protected function getAll(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    protected function getAll(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return $this->remember(
-            $this->getCacheKey('all'),
+            $this->getCacheKey('all', $page),
             fn () => $this->paginate(
                 $this->model->query(),
                 $perPage

@@ -20,9 +20,10 @@ class OrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
-            $orders = $this->orderService->getAllOrders($perPage);
-            return $this->successResponse('Orders retrieved successfully', [...$orders]);
+            $orders = $this->orderService->getAllOrders($page, $perPage);
+            return $this->successResponse('Orders retrieved successfully', ['orders' => $orders]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -33,7 +34,7 @@ class OrderController extends Controller
         try {
             $perPage = $request->get('per_page') ?? 25;
             $orders = $this->orderService->getOrdersByClient($id, $perPage);
-            return $this->successResponse('Orders retrieved successfully', [...$orders]);
+            return $this->successResponse('Orders retrieved successfully', ['orders' => $orders]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -48,7 +49,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->getOrderById($id);
-            return $this->successResponse('Order retrieved successfully', [$order]);
+            return $this->successResponse('Order retrieved successfully', ['order' => $order]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -58,7 +59,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->getMyOrderById($id);
-            return $this->successResponse('Order retrieved successfully', [$order]);
+            return $this->successResponse('Order retrieved successfully', ['order' => $order]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -68,7 +69,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->createOrder($request->validated());
-            return $this->successResponse('Order created successfully', [$order], 201);
+            return $this->successResponse('Order created successfully', ['order' => $order], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -78,7 +79,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->createMyOrder($request->validated());
-            return $this->successResponse('Order created successfully', [$order], 201);
+            return $this->successResponse('Order created successfully', ['order' => $order], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -88,7 +89,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->updateOrder($id, $request->validated());
-            return $this->successResponse('Order updated successfully', [$order]);
+            return $this->successResponse('Order updated successfully', ['order' => $order]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -98,7 +99,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->updateMyOrder($id, $request->validated());
-            return $this->successResponse('Order updated successfully', [$order]);
+            return $this->successResponse('Order updated successfully', ['order' => $order]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

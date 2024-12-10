@@ -18,9 +18,10 @@ class RoleController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
-            $roles = $this->roleService->getAllRoles($perPage);
-            return $this->successResponse('Roles retrieved successfully', [...$roles]);
+            $roles = $this->roleService->getAllRoles($page, $perPage);
+            return $this->successResponse('Roles retrieved successfully', ['roles' => $roles]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -29,16 +30,14 @@ class RoleController extends Controller
     public function assignUser(int $roleId, Request $request): JsonResponse
     {
         try {
-            dd($request->all());
             $validated = $request->validate([
                 'user_id' => 'required|integer|exists:users,id',
             ]);
 
             $assigned = $this->roleService->assignRoleToUser($roleId, $validated['user_id']);
-            
             return $this->successResponse(
                 $assigned ? 'Role assigned successfully' : 'Role was already assigned',
-                ['assigned' => $assigned]
+                ['role' => $assigned]
             );
         } catch (\Exception $e) {
             return $this->handleException($e);

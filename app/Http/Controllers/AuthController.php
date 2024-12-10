@@ -38,8 +38,9 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         try {
-            $token = $this->authService->login($request->validated());
-            return $this->successResponse('Successfully logged in', [$token]);
+            $data = $request->validated();
+            $token = $this->authService->login($data);
+            return $this->successResponse('Successfully logged in', ['token' => $token]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -59,7 +60,7 @@ class AuthController extends Controller
     {
         try {
             $newToken = $this->authService->refresh($request->bearerToken());
-            return $this->successResponse('Token refreshed', [$newToken]);
+            return $this->successResponse('Token refreshed', ['token' => $newToken]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

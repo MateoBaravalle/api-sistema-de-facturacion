@@ -84,6 +84,13 @@ abstract class Service
         foreach ($types as $type) {
             $this->forget($this->getCacheKey($type, $id));
         }
+
+        $page = 10;
+
+        while ($page > 1) {
+            $this->forget($this->getCacheKey('all', $page));
+            $page--;
+        }
     }
 
     /**
@@ -123,8 +130,8 @@ abstract class Service
         return $query->orderBy($orderBy, $direction);
     }
 
-    protected function paginate(Builder $query, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    protected function paginate(Builder $query, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $query->paginate($perPage);
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 }

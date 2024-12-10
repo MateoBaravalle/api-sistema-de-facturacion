@@ -14,11 +14,11 @@ class ClientService extends Service
         parent::__construct($client, self::MODEL);
     }
 
-    public function getAllClients(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllClients(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return $this->remember(
-            $this->getCacheKey('all'),
-            fn () => $this->paginate($this->model->query(), $perPage)
+            $this->getCacheKey('all', $page),
+            fn () => $this->paginate($this->model->query(), $page, $perPage)
         );
     }
 

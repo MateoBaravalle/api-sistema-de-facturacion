@@ -57,7 +57,7 @@ class StoreTransactionRequest extends FormRequest
     {
         if (!$this->has('status')) {
             $this->merge([
-                'status' => 'pending'
+                'status' => 'pending',
             ]);
         }
     }

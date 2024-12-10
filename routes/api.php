@@ -29,7 +29,7 @@ Route::group(['middleware' => 'api'], function () {
     Route::group(['middleware' => 'auth:api'], function () {
         // Manejo de autenticación
         Route::get('/logout', [AuthController::class, 'logout']); // Cerrar sesión
-        Route::get('/refresh', [AuthController::class, 'refresh']); // Refrescar token  
+        Route::get('/refresh', [AuthController::class, 'refresh']); // Refrescar token
         
         // Admin routes
         Route::group(['middleware' => 'role:admin'], function () {

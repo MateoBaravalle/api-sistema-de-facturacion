@@ -27,7 +27,7 @@ class ClientService extends Service
     public function createClient(array $data): Client
     {
         $client = $this->create($data);
-        $this->clearModelCache($client->id, [self::MODEL]);
+        // $this->clearModelCache($client->id, [self::MODEL]);
         return $client->fresh();
     }
 
@@ -36,11 +36,11 @@ class ClientService extends Service
         $client = $this->getClientById($id);
         $client->update($data);
         
-        $this->clearModelCacheWithSuffixes(
-            $id,
-            ['client', 'transactions', 'orders', 'invoices'],
-            ['pending', 'completed', 'averages']
-        );
+        // $this->clearModelCacheWithSuffixes(
+        //     $id,
+        //     ['client', 'transactions', 'orders', 'invoices'],
+        //     ['pending', 'completed', 'averages']
+        // );
         
         return $client->fresh();
     }
@@ -49,13 +49,13 @@ class ClientService extends Service
     {
         $deleted = $this->getClientById($id)->delete();
 
-        if ($deleted) {
-            $this->clearModelCacheWithSuffixes(
-                $id,
-                ['client', 'transactions', 'orders', 'invoices'],
-                ['pending', 'completed', 'averages']
-            );
-        }
+        // if ($deleted) {
+        //     $this->clearModelCacheWithSuffixes(
+        //         $id,
+        //         ['client', 'transactions', 'orders', 'invoices'],
+        //         ['pending', 'completed', 'averages']
+        //     );
+        // }
 
         return $deleted;
     }

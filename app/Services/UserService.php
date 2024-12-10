@@ -34,7 +34,7 @@ class UserService extends Service
         return DB::transaction(function () use ($data, $role) {
             $user = $this->create($data);
             $user->roles()->attach(Role::where('name', $role)->first());
-            $this->clearModelCache($user->id, ['user', 'roles']);
+            // $this->clearModelCache($user->id, ['user', 'roles']);
             return $user;
         });
     }
@@ -49,7 +49,7 @@ class UserService extends Service
 
         $user->roles()->sync(Role::where('name', $role)->first());
         
-        $this->clearModelCache($id, ['user', 'roles']);
+        // $this->clearModelCache($id, ['user', 'roles']);
         
         return $user->fresh();
     }
@@ -59,9 +59,9 @@ class UserService extends Service
         $user = $this->getUserById($id);
         $deleted = $user->delete();
         
-        if ($deleted) {
-            $this->clearModelCache($id, ['user', 'roles']);
-        }
+        // if ($deleted) {
+        //     $this->clearModelCache($id, ['user', 'roles']);
+        // }
         
         return $deleted;
     }

@@ -29,9 +29,9 @@ class RoleService extends Service
         $role = $this->getRoleById($roleId);
         $attached = $role->users()->syncWithoutDetaching([$userId]);
         
-        if (!empty($attached)) {
-            $this->clearModelCache($roleId, ['role', 'users']);
-        }
+        // if (!empty($attached)) {
+        //     $this->clearModelCache($roleId, ['role', 'users']);
+        // }
         
         return !empty($attached);
     }

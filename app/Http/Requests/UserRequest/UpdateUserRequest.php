@@ -58,7 +58,8 @@ class UpdateUserRequest extends FormRequest
             'email.email' => 'Debe ser un correo electrónico válido',
             'email.unique' => 'Este correo electrónico ya está registrado',
             'password.string' => 'La contraseña debe ser una cadena de texto',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+            'password.regex' => 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y un carácter especial',
             'phone.max' => 'El teléfono no debe exceder 20 caracteres',
             'phone.regex' => 'El teléfono solo puede contener números',
         ];

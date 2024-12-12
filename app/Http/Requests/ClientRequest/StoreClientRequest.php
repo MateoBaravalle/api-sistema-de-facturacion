@@ -26,7 +26,7 @@ class StoreClientRequest extends FormRequest
         return [
             'user_id' => ['sometimes', 'exists:users,id'],
             'name' => ['required', 'string', 'max:255'],
-            'cuit' => ['required', 'string', 'unique:clients,cuit'],
+            'cuit' => ['required', 'string', 'unique:clients,cuit', 'regex:/^\d{2}-\d{8}-\d{1}$/'],
             'email' => ['required', 'email', 'unique:clients,email'],
             'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'address' => ['required', 'string'],

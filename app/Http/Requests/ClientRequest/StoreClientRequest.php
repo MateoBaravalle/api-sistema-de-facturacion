@@ -16,7 +16,7 @@ class StoreClientRequest extends FormRequest
     protected function failedValidation(Validator $validator): void
     {
         throw new HttpResponseException(response()->json([
-            'message' => 'Validation failed',
+            'message' => 'Validación fallida',
             'error' => $validator->errors(),
         ], 422));
     }
@@ -24,15 +24,16 @@ class StoreClientRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'cuit' => 'required|string|unique:clients,cuit',
-            'email' => 'required|email|unique:clients,email',
-            'phone' => 'required|string|max:20|regex:/^[0-9]+$/',
-            'address' => 'required|string',
-            'city' => 'required|string',
-            'province' => 'required|string',
-            'credit_limit' => 'sometimes|numeric|min:0',
-            'balance' => 'sometimes|numeric',
+            'user_id' => ['sometimes', 'exists:users,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'cuit' => ['required', 'string', 'unique:clients,cuit', 'regex:/^\d{2}-\d{8}-\d{1}$/'],
+            'email' => ['required', 'email', 'unique:clients,email'],
+            'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+            'address' => ['required', 'string'],
+            'city' => ['required', 'string'],
+            'province' => ['required', 'string'],
+            'credit_limit' => ['sometimes', 'numeric', 'min:0'],
+            'balance' => ['sometimes', 'numeric'],
         ];
     }
 
@@ -66,14 +67,12 @@ class StoreClientRequest extends FormRequest
 
     protected function prepareForValidation()
     {
-        // Establecer balance inicial en 0 si no existe
         if (!$this->has('balance')) {
             $this->merge([
                 'balance' => 0,
             ]);
         }
 
-        // Establecer credit_limit inicial en 0 si no existe
         if (!$this->has('credit_limit')) {
             $this->merge([
                 'credit_limit' => 0,

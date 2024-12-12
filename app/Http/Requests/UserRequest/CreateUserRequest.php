@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\UserRequest;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class CreateUserRequest extends FormRequest
@@ -17,7 +17,7 @@ class CreateUserRequest extends FormRequest
     {
         throw new HttpResponseException(response()->json([
             'status' => 'error',
-            'message' => 'Validation failed',
+            'message' => 'Validación fallida',
             'errors' => $validator->errors(),
         ], 422));
     }
@@ -25,13 +25,21 @@ class CreateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'required|string|max:255|unique:users,username|regex:/^[a-zA-Z0-9._-]+$/',
-            'name' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6',
-            'phone' => 'nullable|string|max:20|regex:/^[0-9]+$/',
-            'role' => 'sometimes|exists:roles,name',
+            'username' => ['required', 'string', 'max:255', 'unique:users,username', 'regex:/^[a-zA-Z0-9._-]+$/'],
+            'name' => ['required', 'string', 'max:255'],
+            'lastname' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => [
+                'sometimes',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/',
+            ],
+            'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+            'role' => ['sometimes', 'exists:roles,name'],
         ];
     }
 
@@ -54,7 +62,8 @@ class CreateUserRequest extends FormRequest
             'email.unique' => 'Este correo electrónico ya está registrado',
             'password.required' => 'La contraseña es requerida',
             'password.string' => 'La contraseña debe ser una cadena de texto',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+            'password.regex' => 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y un carácter especial',
             'phone.max' => 'El teléfono no debe exceder 20 caracteres',
             'phone.regex' => 'El teléfono solo puede contener números',
         ];
@@ -64,7 +73,7 @@ class CreateUserRequest extends FormRequest
     {
         if (!$this->has('role')) {
             $this->merge([
-                'role' => 'guest'
+                'role' => 'guest',
             ]);
         }
     }

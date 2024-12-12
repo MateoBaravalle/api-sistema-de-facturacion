@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -24,41 +25,59 @@ abstract class Service
         return $this->model->create($data);
     }
 
-    protected function getAll(int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    protected function paginate(Builder $query, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
-        return $this->remember(
-            $this->getCacheKey('all'),
-            fn () => $this->paginate(
-                $this->model->query(),
-                $perPage
-            )
+        return $query->paginate($perPage, ['*'], 'page', $page);
+    }
+
+    protected function getAll(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    {
+        // return $this->remember(
+        //     $this->getCacheKey('all', $page . $perPage),
+        //     fn () => $this->paginate(
+        //         $this->model->query(),
+        //         $page,
+        //         $perPage
+        //     )
+        // );
+        return $this->paginate(
+            $this->model->query(),
+            $page,
+            $perPage
         );
     }
 
     protected function getById(int $id): Model
     {
-        return $this->remember(
-            $this->getCacheKey('id', $id),
-            fn () => $this->model->findOrFail($id)
-        );
+        // return $this->remember(
+        //     $this->getCacheKey('id', $id),
+        //     fn () => $this->model->findOrFail($id)
+        // );
+        return $this->model->findOrFail($id);
     }
 
     protected function getByIdWith(int $id, array $relation): Model
     {
-        sort($relation);
-        $cacheKey = $this->getCacheKey('with.' . implode('.', $relation), $id);
+        // sort($relation);
+        // $cacheKey = $this->getCacheKey('with.' . implode('.', $relation), $id);
 
-        return $this->remember(
-            $cacheKey,
-            fn () => $this->model->with($relation)->findOrFail($id)
-        );
+        // return $this->remember(
+        //     $cacheKey,
+        //     fn () => $this->model->with($relation)->findOrFail($id)
+        // );
+        return $this->model->with($relation)->findOrFail($id);
     }
 
     protected function belongsToClient(int $id): bool
     {
-        return $this->model->where('id', $id)
-            ->where('client_id', auth()->user()->client->id)
-            ->exists();
+        $client = auth()->user()->client;
+        $query = $this->model->where('id', $id);
+
+        if (!$client) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+
+        return $query->where('client_id', $client->id)->exists();
     }
 
     protected function remember(string $key, callable $callback): mixed
@@ -84,16 +103,17 @@ abstract class Service
         foreach ($types as $type) {
             $this->forget($this->getCacheKey($type, $id));
         }
-    }
+        // Get the total number of pages from the latest paginator instance
+        $query = $this->model->query();
+        $paginator = $query->paginate(self::DEFAULT_PER_PAGE);
+        $lastPage = $paginator->lastPage();
 
-    /**
-     * Limpia múltiples claves de caché relacionadas con un modelo
-     *
-     * @param int $id
-     * @param array<string> $types
-     * @param array<string> $suffixes
-     * @return void
-     */
+        // Clear cache for all pages
+        for ($page = 1; $page <= $lastPage; $page++) {
+            $this->forget($this->getCacheKey('all', $page));
+        }
+    }
+    
     protected function clearModelCacheWithSuffixes(?int $id, array $types, array $suffixes = []): void
     {
         foreach ($types as $type) {
@@ -107,24 +127,5 @@ abstract class Service
                 $this->forget($cacheKeyWithSuffix);
             }
         }
-    }
-
-    /**
-     * @param Builder $query
-     * @param string $orderBy
-     * @param string $direction
-     * @return Builder
-     */
-    protected function getOrderedQuery(
-        Builder $query,
-        string $orderBy = 'created_at',
-        string $direction = self::DEFAULT_ORDER
-    ): Builder {
-        return $query->orderBy($orderBy, $direction);
-    }
-
-    protected function paginate(Builder $query, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        return $query->paginate($perPage);
     }
 }

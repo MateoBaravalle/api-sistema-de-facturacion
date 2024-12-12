@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderRequest\StoreOrderRequest;
 use App\Http\Requests\OrderRequest\UpdateOrderRequest;
 use App\Services\OrderService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,9 +21,10 @@ class OrderController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
-            $orders = $this->orderService->getAllOrders($perPage);
-            return $this->successResponse('Orders retrieved successfully', [...$orders]);
+            $orders = $this->orderService->getAllOrders($page, $perPage);
+            return $this->successResponse('Ordenes recuperadas', ['orders' => $orders]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -33,7 +35,7 @@ class OrderController extends Controller
         try {
             $perPage = $request->get('per_page') ?? 25;
             $orders = $this->orderService->getOrdersByClient($id, $perPage);
-            return $this->successResponse('Orders retrieved successfully', [...$orders]);
+            return $this->successResponse('Ordenes recuperadas', ['orders' => $orders]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -41,14 +43,20 @@ class OrderController extends Controller
 
     public function getMyOrders(): JsonResponse
     {
-        return $this->getByClient(auth()->user()->client->id);
+        $client = auth()->user()->client;
+
+        if (!$client) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+
+        return $this->getByClient($client->id);
     }
 
     public function show(int $id): JsonResponse
     {
         try {
             $order = $this->orderService->getOrderById($id);
-            return $this->successResponse('Order retrieved successfully', [$order]);
+            return $this->successResponse('Orden recuperada', ['order' => $order]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -58,7 +66,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->getMyOrderById($id);
-            return $this->successResponse('Order retrieved successfully', [$order]);
+            return $this->successResponse('Orden recuperada', ['order' => $order]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -68,7 +76,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->createOrder($request->validated());
-            return $this->successResponse('Order created successfully', [$order], 201);
+            return $this->successResponse('Orden creada', ['order' => $order], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -78,7 +86,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->createMyOrder($request->validated());
-            return $this->successResponse('Order created successfully', [$order], 201);
+            return $this->successResponse('Orden creada', ['order' => $order], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -88,7 +96,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->updateOrder($id, $request->validated());
-            return $this->successResponse('Order updated successfully', [$order]);
+            return $this->successResponse('Orden actualizada', ['order' => $order]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -98,7 +106,7 @@ class OrderController extends Controller
     {
         try {
             $order = $this->orderService->updateMyOrder($id, $request->validated());
-            return $this->successResponse('Order updated successfully', [$order]);
+            return $this->successResponse('Orden actualizada', ['order' => $order]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -108,7 +116,7 @@ class OrderController extends Controller
     {
         try {
             $this->orderService->deleteOrder($id);
-            return $this->successResponse('Order deleted successfully');
+            return $this->successResponse('Orden eliminada');
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

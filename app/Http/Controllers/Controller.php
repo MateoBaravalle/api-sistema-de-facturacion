@@ -19,7 +19,7 @@ class Controller extends BaseController
 
     protected function successResponse(
         string $message,
-        array $data = [],
+        array $data = null,
         int $code = 200
     ): JsonResponse {
         $response = [
@@ -27,7 +27,7 @@ class Controller extends BaseController
             'message' => $message,
         ];
         
-        if (!empty($data)) {
+        if ($data) {
             $response['data'] = $data;
         }
         
@@ -55,27 +55,27 @@ class Controller extends BaseController
     {
         $errorData = match (true) {
             $e instanceof JWTException => [
-                'message' => 'Token error',
+                'message' => 'Error en token',
                 'code' => 401,
             ],
             $e instanceof ModelNotFoundException => [
-                'message' => 'Resource not found',
+                'message' => 'Recurso no encontrado',
                 'code' => 404,
             ],
             $e instanceof AuthenticationException => [
-                'message' => 'Authentication failed',
+                'message' => 'Autenticación fallida',
                 'code' => 401,
             ],
             $e instanceof AuthorizationException => [
-                'message' => 'Authorization failed',
+                'message' => 'Autorización fallida',
                 'code' => 403,
             ],
             $e instanceof QueryException => [
-                'message' => 'Database error',
+                'message' => 'Error en base de datos',
                 'code' => 500,
             ],
             default => [
-                'message' => 'Operation failed',
+                'message' => 'Operación fallida',
                 'code' => $defaultCode,
             ]
         };

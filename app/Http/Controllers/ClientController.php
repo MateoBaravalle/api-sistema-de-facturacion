@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ClientRequest\StoreClientRequest;
 use App\Http\Requests\ClientRequest\UpdateClientRequest;
 use App\Services\ClientService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,9 +21,11 @@ class ClientController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
+            $page = $request->get('page', 1);
             $perPage = $request->get('per_page', 10);
-            $clients = $this->clientService->getAllClients($perPage);
-            return $this->successResponse('Clients retrieved successfully', [...$clients]);
+            
+            $clients = $this->clientService->getAllClients($page, $perPage);
+            return $this->successResponse('Clientes recuperados', ['clients' => $clients]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -32,7 +35,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->getClientById($id);
-            return $this->successResponse('Client retrieved successfully', [$client]);
+            return $this->successResponse('Cliente recuperado', ['client' => $client]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -42,7 +45,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->createClient($request->validated());
-            return $this->successResponse('Client created successfully', [$client], 201);
+            return $this->successResponse('Cliente creado', ['client' => $client], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -52,7 +55,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->updateClient($id, $request->validated());
-            return $this->successResponse('Client updated successfully', [$client]);
+            return $this->successResponse('Cliente actualizado', ['client' => $client]);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -62,7 +65,24 @@ class ClientController extends Controller
     {
         try {
             $this->clientService->deleteClient($id);
-            return $this->successResponse('Client deleted successfully');
+            return $this->successResponse('Cliente eliminado');
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    public function storeProfile(StoreClientRequest $request): JsonResponse
+    {
+        try {
+            if (auth()->user()->client) {
+                return $this->errorResponse('El usuario ya tiene un cliente asociado', 422);
+            }
+
+            $validated = $request->validated();
+            $validated['user_id'] = auth()->user()->id;
+
+            $client = $this->clientService->createClient($validated);
+            return $this->successResponse('Cliente creado', ['client' => $client], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -70,11 +90,29 @@ class ClientController extends Controller
 
     public function showProfile(): JsonResponse
     {
-        return $this->show(auth()->id());
+        $client = auth()->user()->client;
+
+        if (!$client) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+
+        return $this->show($client->id);
     }
 
     public function updateProfile(UpdateClientRequest $request): JsonResponse
     {
-        return $this->update($request, auth()->id());
+        $client = auth()->user()->client;
+        
+        if (!$client) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+        
+        $validated = $request->validated();
+        unset($validated['credit_limit']);
+        
+        $newRequest = UpdateClientRequest::createFrom($request);
+        $newRequest->replace($validated);
+        
+        return $this->update($newRequest, $client->id);
     }
 }

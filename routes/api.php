@@ -29,30 +29,33 @@ Route::group(['middleware' => 'api'], function () {
     Route::group(['middleware' => 'auth:api'], function () {
         // Manejo de autenticación
         Route::get('/logout', [AuthController::class, 'logout']); // Cerrar sesión
-        Route::get('/refresh', [AuthController::class, 'refresh']); // Refrescar token  
-        
-        // Admin routes
-        Route::group(['middleware' => 'role:admin'], function () {
-            // Manejo de roles
-            Route::get('/role', [RoleController::class, 'index']);
-            Route::post('/role/{id}/assign', [RoleController::class, 'assignUser']);
-            
-            // Manejo de usuarios
-            Route::get('/user', [UserController::class, 'index']); // Get usuarios paginados
-            Route::post('/user', [UserController::class, 'store']); // Crear un usuario
-            Route::put('/user/{id}', [UserController::class, 'update']); // Actualizar un usuario
-            Route::delete('/user/{id}', [UserController::class, 'destroy']); // Eliminar un usuario
-            
-            // Manejo de transacciones
-            Route::put('/transaction/{id}', [TransactionController::class, 'update']); // Actualizar una transacción
-            Route::delete('/transaction/{id}', [TransactionController::class, 'destroy']); // Eliminar una transacción
-            
-            // Manejo de facturas
-            Route::put('/invoice/{id}', [InvoiceController::class, 'update']); // Actualizar una factura
-            Route::delete('/invoice/{id}', [InvoiceController::class, 'destroy']); // Eliminar una factura
+        Route::get('/refresh', [AuthController::class, 'refresh']); // Refrescar token
 
-            // Vista de métricas
-            // Route::get('/metrics', [MetricController::class, 'index']); // Get métricas
+        // Guest routes
+        Route::group(['middleware' => 'role:guest'], function () {
+            Route::get('/user/me', [UserController::class, 'showProfile']);// Vista del perfil del usuario
+        });
+
+        // Client routes ✅
+        Route::group(['middleware' => 'role:client'], function () {
+
+            Route::get('/client/me', [ClientController::class, 'showProfile']); // Vista del perfil del cliente
+            Route::post('/client/me', [ClientController::class, 'storeProfile']); // Crear un cliente para el usuario
+            Route::put('/client/me', [ClientController::class, 'updateProfile']); // Actualizar el perfil del cliente
+            
+            Route::post('/order/me', [OrderController::class, 'storeMyOrder']); // Generar un pedido
+            Route::put('/order/me/{id}', [OrderController::class, 'updateMyOrder']); // Actualizar un pedido (1hs despues de creado)
+
+            Route::get('/order/me', [OrderController::class, 'getMyOrders']); // Seguimiento de mis pedidos
+            Route::get('/order/me/{id}', [OrderController::class, 'showMyOrder']); // Vista de un pedido, con factura y productos
+            
+            Route::get('/transactions/me', [TransactionController::class, 'getMyTransactions']); // Vista de las transacciones del cliente
+            Route::get('/transactions/me/{id}', [TransactionController::class, 'showMyTransaction']); // Vista de una transacción
+
+            Route::get('/invoice/me', [InvoiceController::class, 'getMyInvoices']); // Vista de las facturas del cliente
+            // Route::get('/invoice/me/{id}', [InvoiceController::class, 'showMyInvoice']); // Vista de una factura
+
+            Route::put('/user/me', [UserController::class, 'updateProfile']); // Actualizar el perfil del usuario
         });
 
         // Supervisor routes
@@ -90,30 +93,28 @@ Route::group(['middleware' => 'api'], function () {
 
         });
 
-        // Client routes ✅
-        Route::group(['middleware' => 'role:client'], function () {
-
-            Route::get('/client/me', [ClientController::class, 'showProfile']); // Vista del perfil del cliente
-            Route::put('/client/me', [ClientController::class, 'updateProfile']); // Actualizar el perfil del cliente
+        // Admin routes
+        Route::group(['middleware' => 'role:admin'], function () {
+            // Manejo de roles
+            Route::get('/role', [RoleController::class, 'index']);
+            Route::post('/role/{id}/assign', [RoleController::class, 'assignUser']);
             
-            Route::post('/order/me', [OrderController::class, 'storeMyOrder']); // Generar un pedido
-            Route::put('/order/me/{id}', [OrderController::class, 'updateMyOrder']); // Actualizar un pedido (1hs despues de creado)
-
-            Route::get('/order/me', [OrderController::class, 'getMyOrders']); // Seguimiento de mis pedidos
-            Route::get('/order/me/{id}', [OrderController::class, 'showMyOrder']); // Vista de un pedido, con factura y productos
+            // Manejo de usuarios
+            Route::get('/user', [UserController::class, 'index']); // Get usuarios paginados
+            Route::post('/user', [UserController::class, 'store']); // Crear un usuario
+            Route::put('/user/{id}', [UserController::class, 'update']); // Actualizar un usuario
+            Route::delete('/user/{id}', [UserController::class, 'destroy']); // Eliminar un usuario
             
-            Route::get('/transactions/me', [TransactionController::class, 'getMyTransactions']); // Vista de las transacciones del cliente
-            Route::get('/transactions/me/{id}', [TransactionController::class, 'showMyTransaction']); // Vista de una transacción
+            // Manejo de transacciones
+            Route::put('/transaction/{id}', [TransactionController::class, 'update']); // Actualizar una transacción
+            Route::delete('/transaction/{id}', [TransactionController::class, 'destroy']); // Eliminar una transacción
+            
+            // Manejo de facturas
+            Route::put('/invoice/{id}', [InvoiceController::class, 'update']); // Actualizar una factura
+            Route::delete('/invoice/{id}', [InvoiceController::class, 'destroy']); // Eliminar una factura
 
-            Route::get('/invoice/me', [InvoiceController::class, 'getMyInvoices']); // Vista de las facturas del cliente
-            // Route::get('/invoice/me/{id}', [InvoiceController::class, 'showMyInvoice']); // Vista de una factura
-
-            Route::put('/user/me', [UserController::class, 'updateProfile']); // Actualizar el perfil del usuario
-        });
-
-        // Guest routes
-        Route::group(['middleware' => 'role:guest'], function () {
-            Route::get('/user/me', [UserController::class, 'showProfile']);// Vista del perfil del usuario
+            // Vista de métricas
+            // Route::get('/metrics', [MetricController::class, 'index']); // Get métricas
         });
     });
 });

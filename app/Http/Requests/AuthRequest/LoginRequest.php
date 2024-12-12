@@ -36,8 +36,16 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'login' => 'required|string',
-            'password' => 'required|string|min:6',
+            'login' => ['required', 'string'],
+            'password' => [
+                'sometimes',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/',
+            ],
         ];
     }
 
@@ -50,7 +58,8 @@ class LoginRequest extends FormRequest
             'login.required' => 'El usuario o correo electrónico es requerido',
             'login.string' => 'El usuario o correo electrónico debe ser una cadena de texto',
             'password.required' => 'La contraseña es requerida',
-            'password.min' => 'La contraseña debe tener al menos 6 caracteres',
+            'password.min' => 'La contraseña debe tener al menos 8 caracteres',
+            'password.regex' => 'La contraseña debe contener al menos una letra minúscula, una letra mayúscula, un número y un carácter especial',
         ];
     }
 }

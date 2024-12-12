@@ -30,7 +30,15 @@ class UpdateUserRequest extends FormRequest
             'name' => ['sometimes', 'string', 'max:255'],
             'lastname' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'unique:users,email,' . $userId],
-            'password' => ['sometimes', 'string', 'min:6'],
+            'password' => [
+                'sometimes',
+                'string',
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[@$!%*#?&]/'
+            ],
             'phone' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'role' => ['sometimes', 'exists:roles,name'],
         ];

@@ -20,7 +20,7 @@ class AuthService
      * Register a new user and return user data with JWT token
      *
      * @param array{username: string, name: string, lastname: string, email: string, password: string, phone?: string} $data
-     * @return array{user: User, token: string}
+     * @return array{user: \App\Models\User, token: string}
      */
     public function register(array $data): array
     {

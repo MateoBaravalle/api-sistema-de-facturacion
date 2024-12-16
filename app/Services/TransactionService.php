@@ -37,7 +37,7 @@ class TransactionService extends Service
         //     }
         // );
 
-        $query = $this->model->where('client_id', $clientId);
+        $query = $this->model->query()->where('client_id', $clientId);
         
         return $perPage
             ? $this->paginate($query, $page, $perPage)
@@ -56,7 +56,9 @@ class TransactionService extends Service
         //         $perPage
         //     )
         // );
-        $query = $this->model->where('status', $status)->orderBy('due_date', 'asc');
+        $query = $this->model->query()
+            ->where('status', $status)
+            ->orderBy('due_date', 'asc');
         
         return $this->paginate($query, $page, $perPage);
     }
@@ -77,19 +79,16 @@ class TransactionService extends Service
 
     public function createTransaction(array $data): Transaction
     {
-        $transaction = $this->create($data);
         // $this->clearModelCache($transaction->id, ['transaction']);
-        return $transaction;
+        
+        return $this->create($data);
     }
 
     public function updateTransaction(int $id, array $data): Transaction
     {
-        $transaction = $this->getTransactionById($id);
-        $transaction->update($data);
-        
         // $this->clearModelCache($id, ['transaction']);
         
-        return $transaction->fresh();
+        return $this->update($id, $data);
     }
 
     public function updateMyTransaction(int $id, array $data): Transaction
@@ -103,9 +102,9 @@ class TransactionService extends Service
 
     public function deleteTransaction(int $id): bool
     {
-        $transaction = $this->getTransactionById($id);
         // $this->clearModelCache($id, ['transaction']);
-        return $transaction->delete();
+
+        return $this->delete($id);
     }
 
     public function getAverageTransactionAmount(int $clientId): array

@@ -20,11 +20,6 @@ abstract class Service
     ) {
     }
 
-    protected function create(array $data): Model
-    {
-        return $this->model->create($data);
-    }
-
     protected function paginate(Builder $query, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
     {
         return $query->paginate($perPage, ['*'], 'page', $page);
@@ -66,6 +61,24 @@ abstract class Service
         //     fn () => $this->model->with($relation)->findOrFail($id)
         // );
         return $this->model->with($relation)->findOrFail($id);
+    }
+
+    protected function create(array $data): Model
+    {
+        return $this->model->create($data);
+    }
+
+    protected function update(int $id, array $data): Model
+    {
+        $model = $this->getById($id);
+        $model->update($data);
+        return $model->fresh();
+    }
+
+    protected function delete(int $id): bool
+    {
+        $model = $this->getById($id);
+        return $model->delete();
     }
 
     protected function belongsToClient(int $id): bool

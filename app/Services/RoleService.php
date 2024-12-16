@@ -21,7 +21,7 @@ class RoleService extends Service
 
     public function getRoleById(int $id): Role
     {
-        return $this->getById($id, self::MODEL);
+        return $this->getById($id);
     }
 
     public function assignRoleToUser(int $roleId, int $userId): bool

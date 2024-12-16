@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -21,7 +22,7 @@ class UserService extends Service
         return $this->getAll($page, $perPage);
     }
 
-    public function getUserById(int $id): User
+    public function getUserById(int $id): Model
     {
         return $this->getById($id);
     }
@@ -39,30 +40,26 @@ class UserService extends Service
         });
     }
 
-    public function updateUser(int $id, array $data): User
+    public function updateUser(int $id, array $data): Model
     {
         $role = $data['role'];
         unset($data['role']);
         
-        $user = $this->getUserById($id);
-        $user->update($data);
-
+        $user = $this->update($id, $data);
+        
         $user->roles()->sync(Role::where('name', $role)->first());
         
         // $this->clearModelCache($id, ['user', 'roles']);
         
-        return $user->fresh();
+        return $user;
     }
 
     public function deleteUser(int $id): bool
-    {
-        $user = $this->getUserById($id);
-        $deleted = $user->delete();
-        
+    {   
         // if ($deleted) {
         //     $this->clearModelCache($id, ['user', 'roles']);
         // }
         
-        return $deleted;
+        return $this->delete($id);
     }
 }

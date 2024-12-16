@@ -55,7 +55,7 @@ class OrderService extends Service
         //     )
         // );
         return $this->paginate(
-            $this->model->where('status', $status),
+            $this->model->query()->where('status', $status),
             $page,
             $perPage
         );
@@ -103,16 +103,13 @@ class OrderService extends Service
 
     public function updateOrder(int $id, array $data): Order
     {
-        $order = $this->getById($id);
-        $order->update($data);
-        
         // $this->clearModelCacheWithSuffixes(
         //     $id,
         //     ['order', 'client', 'order'],
         //     ['pending', 'completed']
         // );
-        
-        return $order->fresh();
+            
+        return $this->update($id, $data);
     }
 
     public function updateMyOrder(int $id, array $data): Order
@@ -121,15 +118,11 @@ class OrderService extends Service
             throw new AuthorizationException('La orden no pertenece al cliente actual');
         }
 
-        $order = $this->getById($id);
-        $order->update($data);
-        return $order->fresh();
+        return $this->updateOrder($id, $data);
     }
 
     public function deleteOrder(int $id): bool
     {
-        $deleted = $this->getById($id)->delete();
-
         // if ($deleted) {
         //     $this->clearModelCacheWithSuffixes(
         //         $id,
@@ -137,7 +130,7 @@ class OrderService extends Service
         //         ['pending', 'completed']
         //     );
         // }
-
-        return $deleted;
+                
+        return $this->delete($id);
     }
 }

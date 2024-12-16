@@ -22,7 +22,7 @@ class InvoiceService extends Service
 
     public function getInvoiceById(int $id): Invoice
     {
-        return $this->getById($id, self::MODEL);
+        return $this->getById($id);
     }
 
     public function getInvoicesByClient(int $clientId, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
@@ -37,7 +37,7 @@ class InvoiceService extends Service
         //     )
         // );
         return $this->paginate(
-            $this->model->where('client_id', $clientId),
+            $this->model->query()->where('client_id', $clientId),
             $page,
             $perPage
         );
@@ -55,7 +55,7 @@ class InvoiceService extends Service
         //     )
         // );
         return $this->paginate(
-            $this->model->where('status', $status),
+            $this->model->query()->where('status', $status),
             $page,
             $perPage
         );
@@ -83,29 +83,23 @@ class InvoiceService extends Service
 
     public function createInvoice(array $data): Invoice
     {
-        $invoice = $this->create($data);
         // $this->clearModelCache($invoice->id, [self::MODEL]);
-        return $invoice;
+        return $this->create($data);
     }
 
     public function updateInvoice(int $id, array $data): Invoice
     {
-        $invoice = $this->getInvoiceById($id);
-        $invoice->update($data);
-        
         // $this->clearModelCacheWithSuffixes(
         //     $id,
         //     ['invoice', 'client', 'order'],
         //     ['pending', 'completed']
         // );
-        
-        return $invoice->fresh();
+            
+        return $this->update($id, $data);
     }
 
     public function deleteInvoice(int $id): bool
     {
-        $deleted = $this->getInvoiceById($id)->delete();
-
         // if ($deleted) {
         //     $this->clearModelCacheWithSuffixes(
         //         $id,
@@ -113,7 +107,7 @@ class InvoiceService extends Service
         //         ['pending', 'completed']
         //     );
         // }
-
-        return $deleted;
+                
+        return $this->delete($id);
     }
 }

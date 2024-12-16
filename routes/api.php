@@ -3,7 +3,10 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
@@ -45,16 +48,21 @@ Route::group(['middleware' => 'api'], function () {
             
             Route::post('/order/me', [OrderController::class, 'storeMyOrder']); // Generar un pedido
             Route::put('/order/me/{id}', [OrderController::class, 'updateMyOrder']); // Actualizar un pedido (1hs despues de creado)
-
+            
             Route::get('/order/me', [OrderController::class, 'getMyOrders']); // Seguimiento de mis pedidos
             Route::get('/order/me/{id}', [OrderController::class, 'showMyOrder']); // Vista de un pedido, con factura y productos
             
             Route::get('/transactions/me', [TransactionController::class, 'getMyTransactions']); // Vista de las transacciones del cliente
             Route::get('/transactions/me/{id}', [TransactionController::class, 'showMyTransaction']); // Vista de una transacción
+            
+            Route::get('/payments/me', [PaymentController::class, 'getMyPayments']); // Vista de los pagos del cliente
+            Route::post('payments/me', [PaymentController::class, 'storeMyPayment']); // Crear un pago
 
             Route::get('/invoice/me', [InvoiceController::class, 'getMyInvoices']); // Vista de las facturas del cliente
             // Route::get('/invoice/me/{id}', [InvoiceController::class, 'showMyInvoice']); // Vista de una factura
-
+            
+            Route::get('notifications', [NotificationController::class, 'index']); // Get notificaciones paginadas
+            
             Route::put('/user/me', [UserController::class, 'updateProfile']); // Actualizar el perfil del usuario
         });
 
@@ -91,8 +99,36 @@ Route::group(['middleware' => 'api'], function () {
             Route::post('/invoice', [InvoiceController::class, 'store']); // Crear una factura
             Route::get('/invoice/status', [InvoiceController::class, 'getByStatus']); // Get facturas por estado
 
-        });
+            // CRUD de Productos
+            Route::get('products', [ProductController::class, 'getAll']); // Get productos paginados
+            Route::post('products', [ProductController::class, 'store']); // Crear un producto
+            Route::put('products/{id}', [ProductController::class, 'update']); // Actualizar un producto
+            Route::delete('products/{id}', [ProductController::class, 'destroy']); // Eliminar un producto
 
+            // CRUD de Listas de Precios
+            Route::get('price-list/{id}', [ProductController::class, 'getAllBySupplier']); // Vista de una lista de precios
+            Route::post('price-list', [ProductController::class, 'storeBySupplier']); // Crear una lista de precios
+            Route::put('price-list/{id}', [ProductController::class, 'updateBySupplier']); // Actualizar una lista de precios
+            Route::delete('price-list/{id}', [ProductController::class, 'destroyBySupplier']);
+            
+            // CRUD de Descuentos
+            // Route::get('discounts', [DiscountController::class, 'index']); // Get descuentos paginados
+            // Route::post('discounts', [DiscountController::class, 'store']); // Crear un descuento
+            // Route::put('discounts/{id}', [DiscountController::class, 'update']); // Actualizar un descuento
+            // Route::delete('discounts/{id}', [DiscountController::class, 'destroy']); // Eliminar un descuento
+
+            // CRUD de Notificaciones
+            Route::post('notifications', [NotificationController::class, 'store']); // Crear una notificación
+            Route::put('notifications/{id}', [NotificationController::class, 'update']); // Actualizar una notificación
+            Route::delete('notifications/{id}', [NotificationController::class, 'destroy']); // Eliminar una notificación
+
+            // CRUD de Pagos
+            Route::get('payments', [PaymentController::class, 'index']); // Get pagos paginados
+            Route::post('payments', [PaymentController::class, 'store']); // Crear un pago
+            Route::put('payments/{id}', [PaymentController::class, 'update']); // Actualizar un pago
+            Route::delete('payments/{id}', [PaymentController::class, 'destroy']); // Eliminar un pago
+        });
+        
         // Admin routes
         Route::group(['middleware' => 'role:admin'], function () {
             // Manejo de roles
@@ -112,7 +148,8 @@ Route::group(['middleware' => 'api'], function () {
             // Manejo de facturas
             Route::put('/invoice/{id}', [InvoiceController::class, 'update']); // Actualizar una factura
             Route::delete('/invoice/{id}', [InvoiceController::class, 'destroy']); // Eliminar una factura
-
+            
+            
             // Vista de métricas
             // Route::get('/metrics', [MetricController::class, 'index']); // Get métricas
         });

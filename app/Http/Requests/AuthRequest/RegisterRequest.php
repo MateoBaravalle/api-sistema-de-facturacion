@@ -42,15 +42,14 @@ class RegisterRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'lastname' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:6'],
             'password' => [
-                'sometimes',
+                'required',
                 'string',
                 'min:8',
                 'regex:/[a-z]/',
                 'regex:/[A-Z]/',
                 'regex:/[0-9]/',
-                'regex:/[@$!%*#?&]/',
+                'regex:/[@$!%*#?&-_]/',
             ],
         ];
     }

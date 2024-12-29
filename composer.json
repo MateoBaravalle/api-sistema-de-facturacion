@@ -9,12 +9,11 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "fruitcake/php-cors": "^1.2",
         "guzzlehttp/guzzle": "^7.7",
         "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
-        "tymon/jwt-auth": "^2.0"
+        "tymon/jwt-auth": "^2.1"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -41,6 +40,13 @@
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"
+        ],
+        "post-install-cmd": [
+            "@php artisan clear-compiled",
+            "@php artisan optimize:clear",
+            "@php artisan config:cache",
+            "@php artisan route:cache",
+            "@php artisan view:cache"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"

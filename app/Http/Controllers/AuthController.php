@@ -27,7 +27,7 @@ class AuthController extends Controller
 
             return $this->successResponse(
                 'Registrado',
-                [...$result],
+                ['token' => $result['token']],
                 201
             );
         } catch (\Exception $e) {

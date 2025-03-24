@@ -112,4 +112,9 @@ class OrderService extends Service
                 
         return $this->delete($id);
     }
+
+    public function getAverageOrderAmount(int $clientId): float
+    {
+        return $this->model->where('client_id', $clientId)->avg('amount');
+    }
 }

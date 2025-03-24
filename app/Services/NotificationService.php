@@ -14,9 +14,15 @@ class NotificationService extends Service
         parent::__construct($notification, self::MODEL);
     }
 
-    public function getAllNotifications(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllNotifications(array $params): LengthAwarePaginator
     {
-        return $this->getAll($page, $perPage);
+        $query = $this->model->query()->where('user_id', auth()->user()->id);
+        $query = $this->getFilteredAndSorted(
+            $query,
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
     }
 
     public function getNotificationById(int $id): Notification

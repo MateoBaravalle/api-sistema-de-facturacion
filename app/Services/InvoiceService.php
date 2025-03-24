@@ -15,9 +15,24 @@ class InvoiceService extends Service
         parent::__construct($invoice, self::MODEL);
     }
 
-    public function getAllInvoices(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllInvoices(array $params): LengthAwarePaginator
     {
-        return $this->getAll($page, $perPage);
+        $query = $this->getFilteredAndSorted(
+            $this->model->query(),
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
+    }
+
+    public function getMyInvoices(array $params): LengthAwarePaginator
+    {
+        $query = $this->getFilteredAndSorted(
+            $this->getMyThing(),
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
     }
 
     public function getInvoiceById(int $id): Invoice
@@ -25,56 +40,9 @@ class InvoiceService extends Service
         return $this->getById($id);
     }
 
-    public function getInvoicesByClient(int $clientId, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        // $cacheKey = $this->getCacheKey('client', $clientId . $page . $perPage);
-        // return $this->remember(
-        //     $cacheKey,
-        //     fn () => $this->paginate(
-        //         $this->model->where('client_id', $clientId),
-        //         $page,
-        //         $perPage
-        //     )
-        // );
-        return $this->paginate(
-            $this->model->query()->where('client_id', $clientId),
-            $page,
-            $perPage
-        );
-    }
-
-    public function getInvoicesByStatus(string $status, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        // $cacheKey = $this->getCacheKey('status', $status . $page . $perPage);
-        // return $this->remember(
-        //     $cacheKey,
-        //     fn () => $this->paginate(
-        //         $this->model->where('status', $status),
-        //         $page,
-        //         $perPage
-        //     )
-        // );
-        return $this->paginate(
-            $this->model->query()->where('status', $status),
-            $page,
-            $perPage
-        );
-    }
-
-    public function getMyInvoices(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        $client = auth()->user()->client;
-
-        if (!$client) {
-            throw new AuthorizationException('Cliente no encontrado');
-        }
-
-        return $this->getInvoicesByClient($client->id, $page, $perPage);
-    }
-
     public function getMyInvoiceById(int $invoiceId): Invoice
     {
-        if (!$this->belongsToClient($invoiceId)) {
+        if (!$this->belongsMe($invoiceId)) {
             throw new AuthorizationException('La factura no pertenece al cliente actual');
         }
 

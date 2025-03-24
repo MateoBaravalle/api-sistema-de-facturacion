@@ -10,22 +10,16 @@ use Illuminate\Support\Facades\Cache;
 
 abstract class Service
 {
-    protected const DEFAULT_PER_PAGE = 10;
-    protected const DEFAULT_ORDER = 'desc';
     protected const CACHE_TTL = 1440;
-    
+    protected const DEFAULT_PER_PAGE = 10;
+
     public function __construct(
         protected readonly Model $model,
         protected readonly string $cachePrefix
     ) {
     }
 
-    protected function paginate(Builder $query, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        return $query->paginate($perPage, ['*'], 'page', $page);
-    }
-
-    protected function getAll(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    protected function getAll(int $page, int $perPage, ?Builder $query = null): LengthAwarePaginator
     {
         // return $this->remember(
         //     $this->getCacheKey('all', $page . $perPage),
@@ -35,11 +29,7 @@ abstract class Service
         //         $perPage
         //     )
         // );
-        return $this->paginate(
-            $this->model->query(),
-            $page,
-            $perPage
-        );
+        return ($query ?? $this->model->query())->paginate($perPage, ['*'], 'page', $page);
     }
 
     protected function getById(int $id): Model
@@ -72,25 +62,13 @@ abstract class Service
     {
         $model = $this->getById($id);
         $model->update($data);
+
         return $model->fresh();
     }
 
     protected function delete(int $id): bool
     {
-        $model = $this->getById($id);
-        return $model->delete();
-    }
-
-    protected function belongsToClient(int $id): bool
-    {
-        $client = auth()->user()->client;
-        $query = $this->model->where('id', $id);
-
-        if (!$client) {
-            throw new AuthorizationException('Cliente no encontrado');
-        }
-
-        return $query->where('client_id', $client->id)->exists();
+        return (bool) $this->model->destroy($id);
     }
 
     protected function remember(string $key, callable $callback): mixed
@@ -140,5 +118,69 @@ abstract class Service
                 $this->forget($cacheKeyWithSuffix);
             }
         }
+    }
+
+    protected function getMyThing(): Builder
+    {
+        $client = auth()->user()->client;
+        
+        if (!$client) {
+            throw new AuthorizationException('Cliente no encontrado');
+        }
+        
+        return $this->model->where('client_id', $client->id);
+    }
+
+    protected function belongsMe(int $id): bool
+    {
+        return $this->getMyThing()->where('id', $id)->exists();
+    }
+
+    protected function applyFilters(Builder $query, array $filters): Builder
+    {
+        foreach ($filters as $field => $value) {
+            if ($value === '' || $value === null) {
+                continue;
+            }
+
+            $method = 'filterBy' . ucfirst($field);
+            
+            if (method_exists($this, $method)) {
+                $this->$method($query, $value);
+            } else {
+                if (is_string($value)) {
+                    $value = strtolower($value);
+                    $query->where($field, 'like', "%{$value}%");
+                } elseif (is_bool($value)) {
+                    $query->where($field, $value);
+                }
+            }
+        }
+
+        return $query;
+    }
+
+    protected function applySorting(Builder $query, string $sortBy, string $sortOrder): Builder
+    {
+        $method = 'sortBy' . ucfirst($sortBy);
+            
+        if (method_exists($this, $method)) {
+            $this->$method($query, $sortOrder);
+        } else {
+            $query->orderBy($sortBy, $sortOrder);
+        }
+
+        return $query;
+    }
+
+    protected function getFilteredAndSorted(Builder $query, array $params): Builder
+    {
+        if (! empty($params['filters'])) {
+            $this->applyFilters($query, $params['filters']);
+        }
+
+        $this->applySorting($query, $params['sort_by'], $params['sort_order']);
+
+        return $query;
     }
 }

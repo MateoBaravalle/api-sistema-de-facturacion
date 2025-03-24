@@ -15,9 +15,14 @@ class ProductService extends Service
         parent::__construct($product, self::MODEL);
     }
 
-    public function getAllProducts(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllProducts(array $params): LengthAwarePaginator
     {
-        return $this->getAll($page, $perPage);
+        $query = $this->getFilteredAndSorted(
+            $this->model->query(),
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
     }
 
     public function getProductById(int $id): Product

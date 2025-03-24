@@ -17,9 +17,14 @@ class UserService extends Service
         parent::__construct($user, self::MODEL);
     }
 
-    public function getAllUsers(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllUsers(array $params): LengthAwarePaginator
     {
-        return $this->getAll($page, $perPage);
+        $query = $this->getFilteredAndSorted(
+            $this->model->query(),
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
     }
 
     public function getUserById(int $id): Model

@@ -14,9 +14,14 @@ class ClientService extends Service
         parent::__construct($client, self::MODEL);
     }
 
-    public function getAllClients(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllClients(array $params): LengthAwarePaginator
     {
-        return $this->getAll($page, $perPage);
+        $query = $this->getFilteredAndSorted(
+            $this->model->query(),
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
     }
 
     public function getClientById(int $id): Client

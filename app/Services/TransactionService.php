@@ -16,51 +16,24 @@ class TransactionService extends Service
         parent::__construct($transaction, self::MODEL);
     }
 
-    public function getAllTransactions(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllTransactions(array $params): LengthAwarePaginator
     {
-        return $this->getAll($page, $perPage);
+        $query = $this->getFilteredAndSorted(
+            $this->model->query(),
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
     }
 
-    public function getTransactionByClient(int $clientId, int $page = 1, int $perPage = null): Collection | LengthAwarePaginator
+    public function getMyTransactions(array $params): LengthAwarePaginator
     {
-        // $cacheKey = $perPage
-        //     ? $this->getCacheKey('client', $clientId . $page . $perPage)
-        //     : $this->getCacheKey('client', $clientId . 'all');
-        // return $this->remember(
-        //     $cacheKey,
-        //     function () use ($clientId, $page, $perPage) {
-        //         $query = $this->model->where('client_id', $clientId);
-        //         if ($perPage) {
-        //             return $this->paginate($query, $page, $perPage);
-        //         }
-        //         return $query->get();
-        //     }
-        // );
+        $query = $this->getFilteredAndSorted(
+            $this->getMyThing(),
+            $params
+        );
 
-        $query = $this->model->query()->where('client_id', $clientId);
-        
-        return $perPage
-            ? $this->paginate($query, $page, $perPage)
-            : $query->get();
-    }
-
-    public function getTransactionsByStatus(string $status, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        // $cacheKey = $this->getCacheKey('status', $status . $page . $perPage);
-        // return $this->remember(
-        //     $cacheKey,
-        //     fn () => $this->paginate(
-        //         $this->model->where('status', $status)
-        //             ->orderBy('due_date', 'asc'),
-        //         $page,
-        //         $perPage
-        //     )
-        // );
-        $query = $this->model->query()
-            ->where('status', $status)
-            ->orderBy('due_date', 'asc');
-        
-        return $this->paginate($query, $page, $perPage);
+        return $this->getAll($params['page'], $params['per_page'], $query);
     }
 
     public function getTransactionById(int $id): Transaction
@@ -70,7 +43,7 @@ class TransactionService extends Service
 
     public function getMyTransactionById(int $id): Transaction
     {
-        if (!$this->belongsToClient($id)) {
+        if (!$this->belongsMe($id)) {
             throw new AuthorizationException('La transacción no pertenece al cliente actual');
         }
 
@@ -80,20 +53,23 @@ class TransactionService extends Service
     public function createTransaction(array $data): Transaction
     {
         // $this->clearModelCache($transaction->id, ['transaction']);
+        // $this->clearModelCacheWithSuffixes($transaction->client_id, ['average.client'], []);
         
         return $this->create($data);
     }
 
     public function updateTransaction(int $id, array $data): Transaction
     {
+        $transaction = $this->update($id, $data);
         // $this->clearModelCache($id, ['transaction']);
+        // $this->clearModelCacheWithSuffixes($transaction->client_id, ['average.client'], []);
         
-        return $this->update($id, $data);
+        return $transaction->fresh();
     }
 
     public function updateMyTransaction(int $id, array $data): Transaction
     {
-        if (!$this->belongsToClient($id)) {
+        if (!$this->belongsMe($id)) {
             throw new AuthorizationException('La transacción no pertenece al cliente actual');
         }
 
@@ -103,6 +79,7 @@ class TransactionService extends Service
     public function deleteTransaction(int $id): bool
     {
         // $this->clearModelCache($id, ['transaction']);
+        // $this->clearModelCacheWithSuffixes($transaction->client_id, ['average.client'], []);
 
         return $this->delete($id);
     }
@@ -127,5 +104,10 @@ class TransactionService extends Service
     {
         return $transactions->where('created_at', '>=', now()->subMonths($months))
             ->avg('amount') ?? 0;
+    }
+
+    private function getTransactionByClient(int $clientId): Collection
+    {
+        return $this->model->where('client_id', $clientId)->get();
     }
 }

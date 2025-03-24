@@ -14,9 +14,9 @@ class RoleService extends Service
         parent::__construct($role, 'role');
     }
 
-    public function getAllRoles(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllRoles(array $params): LengthAwarePaginator
     {
-        return $this->getAll($page, $perPage);
+        return $this->getAll($params['page'], $params['per_page']);
     }
 
     public function getRoleById(int $id): Role

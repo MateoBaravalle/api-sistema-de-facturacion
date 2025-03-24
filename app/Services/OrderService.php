@@ -15,9 +15,24 @@ class OrderService extends Service
         parent::__construct($order, self::MODEL);
     }
 
-    public function getAllOrders(int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
+    public function getAllOrders(array $params): LengthAwarePaginator
     {
-        return $this->getAll($page, $perPage);
+        $query = $this->getFilteredAndSorted(
+            $this->model->query(),
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
+    }
+
+    public function getMyOrders(array $params): LengthAwarePaginator
+    {
+        $query = $this->getFilteredAndSorted(
+            $this->getMyThing(),
+            $params
+        );
+
+        return $this->getAll($params['page'], $params['per_page'], $query);
     }
     
     public function getOrderById(int $id): Order
@@ -25,45 +40,9 @@ class OrderService extends Service
         return $this->getByIdWith($id, ['products', 'invoice']);
     }
 
-    public function getOrdersByClient(int $clientId, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        // $cacheKey = $this->getCacheKey('client', $clientId . $page . $perPage);
-        // return $this->remember(
-        //     $cacheKey,
-        //     fn () => $this->paginate(
-        //         $this->model->with('products', 'invoice')->where('client_id', $clientId),
-        //         $page,
-        //         $perPage
-        //     )
-        // );
-        return $this->paginate(
-            $this->model->with('products', 'invoice')->where('client_id', $clientId),
-            $page,
-            $perPage
-        );
-    }
-
-    public function getOrdersByStatus(string $status, int $page, int $perPage = self::DEFAULT_PER_PAGE): LengthAwarePaginator
-    {
-        // $cacheKey = $this->getCacheKey('status', $status . $page . $perPage);
-        // return $this->remember(
-        //     $cacheKey,
-        //     fn () => $this->paginate(
-        //         $this->model->where('status', $status),
-        //         $page,
-        //         $perPage
-        //     )
-        // );
-        return $this->paginate(
-            $this->model->query()->where('status', $status),
-            $page,
-            $perPage
-        );
-    }
-
     public function getMyOrderById(int $orderId): Order
     {
-        if (!$this->belongsToClient($orderId)) {
+        if (!$this->belongsMe($orderId)) {
             throw new AuthorizationException('La orden no pertenece al cliente actual');
         }
 
@@ -114,7 +93,7 @@ class OrderService extends Service
 
     public function updateMyOrder(int $id, array $data): Order
     {
-        if (!$this->belongsToClient($id)) {
+        if (!$this->belongsMe($id)) {
             throw new AuthorizationException('La orden no pertenece al cliente actual');
         }
 

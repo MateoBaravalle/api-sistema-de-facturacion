@@ -18,13 +18,28 @@ class ClientController extends Controller
         $this->clientService = $clientService;
     }
 
+    protected function getAllowedFilters(): array
+    {
+        return [
+            'name',
+            'cuit',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'province',
+            'credit_limit',
+            'balance',
+        ];
+    }
+
     public function index(Request $request): JsonResponse
     {
         try {
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            
-            $clients = $this->clientService->getAllClients($page, $perPage);
+            $clients = $this->clientService->getAllClients(
+                $this->getQueryParams($request)
+            );
+
             return $this->successResponse('Clientes recuperados', ['clients' => $clients]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -44,7 +59,10 @@ class ClientController extends Controller
     public function store(StoreClientRequest $request): JsonResponse
     {
         try {
-            $client = $this->clientService->createClient($request->validated());
+            $client = $this->clientService->createClient(
+                $request->validated()
+            );
+            
             return $this->successResponse('Cliente creado', ['client' => $client], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -54,7 +72,11 @@ class ClientController extends Controller
     public function update(UpdateClientRequest $request, int $id): JsonResponse
     {
         try {
-            $client = $this->clientService->updateClient($id, $request->validated());
+            $client = $this->clientService->updateClient(
+                $id,
+                $request->validated()
+            );
+            
             return $this->successResponse('Cliente actualizado', ['client' => $client]);
         } catch (\Exception $e) {
             return $this->handleException($e);

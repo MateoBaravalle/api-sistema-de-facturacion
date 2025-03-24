@@ -17,12 +17,24 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
+    protected function getAllowedFilters(): array
+    {
+        return [
+            'username',
+            'name',
+            'lastname',
+            'email',
+            'phone',
+        ];
+    }
+
     public function index(Request $request): JsonResponse
     {
         try {
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            $users = $this->userService->getAllUsers($page, $perPage);
+            $users = $this->userService->getAllUsers(
+                $this->getQueryParams($request)
+            );
+
             return $this->successResponse('Usuarios recuperados', ['users' => $users]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -33,6 +45,7 @@ class UserController extends Controller
     {
         try {
             $user = $this->userService->getUserById($id);
+
             return $this->successResponse('Usuario recuperado', ['user' => $user]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -42,7 +55,10 @@ class UserController extends Controller
     public function store(CreateUserRequest $request): JsonResponse
     {
         try {
-            $user = $this->userService->createUser($request->validated());
+            $user = $this->userService->createUser(
+                $request->validated()
+            );
+
             return $this->successResponse('Usuario creado', ['user' => $user], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -52,7 +68,11 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
         try {
-            $user = $this->userService->updateUser($id, $request->validated());
+            $user = $this->userService->updateUser(
+                $id,
+                $request->validated()
+            );
+
             return $this->successResponse('Usuario actualizado', ['user' => $user]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -63,6 +83,7 @@ class UserController extends Controller
     {
         try {
             $this->userService->deleteUser($id);
+
             return $this->successResponse('Usuario eliminado');
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -76,6 +97,9 @@ class UserController extends Controller
 
     public function updateProfile(UpdateUserRequest $request): JsonResponse
     {
-        return $this->update($request, auth()->id());
+        return $this->update(
+            $request,
+            auth()->id()
+        );
     }
 }

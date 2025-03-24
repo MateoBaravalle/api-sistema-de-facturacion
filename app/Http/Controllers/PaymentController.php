@@ -17,12 +17,36 @@ class PaymentController extends Controller
         $this->paymentService = $paymentService;
     }
 
-    public function getAll(Request $request): JsonResponse
+    protected function getAllowedFilters(): array
+    {
+        return [
+            'transaction_id',
+            'payment_method',
+            'status',
+            'payment_date',
+        ];
+    }
+
+    public function index(Request $request): JsonResponse
     {
         try {
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            $payments = $this->paymentService->getAllPayments($page, $perPage);
+            $payments = $this->paymentService->getAllPayments(
+                $this->getQueryParams($request)
+            );
+
+            return $this->successResponse('Pagos recuperados', ['pagos' => $payments]);
+        } catch (\Exception $e) {
+            return $this->handleException($e);
+        }
+    }
+
+    public function myIndex(Request $request): JsonResponse
+    {
+        try {
+            $payments = $this->paymentService->getMyPayments(
+                $this->getQueryParams($request)
+            );
+
             return $this->successResponse('Pagos recuperados', ['pagos' => $payments]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -32,7 +56,10 @@ class PaymentController extends Controller
     public function store(StorePaymentRequest $request): JsonResponse
     {
         try {
-            $payment = $this->paymentService->createPayment($request->validated());
+            $payment = $this->paymentService->createPayment(
+                $request->validated()
+            );
+
             return $this->successResponse('Pago creado', ['pago' => $payment], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -42,7 +69,11 @@ class PaymentController extends Controller
     public function update(UpdatePaymentRequest $request, int $id): JsonResponse
     {
         try {
-            $payment = $this->paymentService->updatePayment($id, $request->validated());
+            $payment = $this->paymentService->updatePayment(
+                $id,
+                $request->validated()
+            );
+
             return $this->successResponse('Pago actualizado', ['pago' => $payment]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -53,6 +84,7 @@ class PaymentController extends Controller
     {
         try {
             $this->paymentService->deletePayment($id);
+
             return $this->successResponse('Pago eliminado');
         } catch (\Exception $e) {
             return $this->handleException($e);

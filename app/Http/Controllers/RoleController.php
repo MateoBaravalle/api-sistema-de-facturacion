@@ -15,12 +15,21 @@ class RoleController extends Controller
         $this->roleService = $roleService;
     }
 
+    protected function getAllowedFilters(): array
+    {
+        return [
+            'name',
+            'description',
+        ];
+    }
+
     public function index(Request $request): JsonResponse
     {
         try {
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            $roles = $this->roleService->getAllRoles($page, $perPage);
+            $roles = $this->roleService->getAllRoles(
+                $this->getQueryParams($request)
+            );
+
             return $this->successResponse('Roles recuperados', ['roles' => $roles]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -33,8 +42,11 @@ class RoleController extends Controller
             $validated = $request->validate([
                 'user_id' => 'required|integer|exists:users,id',
             ]);
+            $assigned = $this->roleService->assignRoleToUser(
+                $roleId,
+                $validated['user_id']
+            );
 
-            $assigned = $this->roleService->assignRoleToUser($roleId, $validated['user_id']);
             return $this->successResponse(
                 $assigned ? 'Role asignado' : 'Role ya asignado',
                 ['assigned' => $assigned]

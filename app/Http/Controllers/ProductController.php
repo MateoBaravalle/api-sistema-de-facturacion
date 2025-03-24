@@ -17,12 +17,23 @@ class ProductController extends Controller
         $this->productService = $productService;
     }
 
-    public function getAll(Request $request): JsonResponse
+    protected function getAllowedFilters(): array
+    {
+        return [
+            'supplier_id',
+            'name',
+            'category',
+            'status',
+        ];
+    }
+
+    public function index(Request $request): JsonResponse
     {
         try {
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            $products = $this->productService->getAllProducts($page, $perPage);
+            $products = $this->productService->getAllProducts(
+                $this->getQueryParams($request)
+            );
+
             return $this->successResponse('Productos recuperados', ['productos' => $products]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -32,7 +43,10 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request): JsonResponse
     {
         try {
-            $product = $this->productService->createProduct($request->validated());
+            $product = $this->productService->createProduct(
+                $request->validated()
+            );
+
             return $this->successResponse('Producto creado', ['producto' => $product], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -42,7 +56,11 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, int $id): JsonResponse
     {
         try {
-            $product = $this->productService->updateProduct($id, $request->validated());
+            $product = $this->productService->updateProduct(
+                $id,
+                $request->validated()
+            );
+
             return $this->successResponse('Producto actualizado', ['producto' => $product]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -53,6 +71,7 @@ class ProductController extends Controller
     {
         try {
             $this->productService->deleteProduct($id);
+
             return $this->successResponse('Producto eliminado');
         } catch (\Exception $e) {
             return $this->handleException($e);

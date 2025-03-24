@@ -17,37 +17,23 @@ class InvoiceController extends Controller
         $this->invoiceService = $invoiceService;
     }
 
+    protected function getAllowedFilters(): array
+    {
+        return [
+            'client_id',
+            'order_id',
+            'status',
+            'date',
+        ];
+    }
+
     public function index(Request $request): JsonResponse
     {
         try {
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            $invoices = $this->invoiceService->getAllInvoices($page, $perPage);
-            return $this->successResponse('Facturas recuperadas', ['invoices' => $invoices]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
-    }
+            $invoices = $this->invoiceService->getAllInvoices(
+                $this->getQueryParams($request)
+            );
 
-    public function getByClient(int $id, Request $request): JsonResponse
-    {
-        try {
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            $invoices = $this->invoiceService->getInvoicesByClient($id, $page, $perPage);
-            return $this->successResponse('Facturas recuperadas', ['invoices' => $invoices]);
-        } catch (\Exception $e) {
-            return $this->handleException($e);
-        }
-    }
-
-    public function getByStatus(Request $request): JsonResponse
-    {
-        try {
-            $status = $request->get('status');
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            $invoices = $this->invoiceService->getInvoicesByStatus($status, $page, $perPage);
             return $this->successResponse('Facturas recuperadas', ['invoices' => $invoices]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -57,9 +43,10 @@ class InvoiceController extends Controller
     public function getMyInvoices(Request $request): JsonResponse
     {
         try {
-            $page = $request->get('page', 1);
-            $perPage = $request->get('per_page', 10);
-            $invoices = $this->invoiceService->getMyInvoices($page, $perPage);
+            $invoices = $this->invoiceService->getMyInvoices(
+                $this->getQueryParams($request)
+            );
+
             return $this->successResponse('Facturas recuperadas', ['invoices' => $invoices]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -70,6 +57,7 @@ class InvoiceController extends Controller
     {
         try {
             $invoice = $this->invoiceService->getInvoiceById($id);
+
             return $this->successResponse('Factura recuperada', ['invoice' => $invoice]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -79,7 +67,10 @@ class InvoiceController extends Controller
     public function store(StoreInvoiceRequest $request): JsonResponse
     {
         try {
-            $invoice = $this->invoiceService->createInvoice($request->validated());
+            $invoice = $this->invoiceService->createInvoice(
+                $request->validated()
+            );
+
             return $this->successResponse('Factura creada', ['invoice' => $invoice], 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -89,7 +80,11 @@ class InvoiceController extends Controller
     public function update(UpdateInvoiceRequest $request, int $id): JsonResponse
     {
         try {
-            $invoice = $this->invoiceService->updateInvoice($id, $request->validated());
+            $invoice = $this->invoiceService->updateInvoice(
+                $id,
+                $request->validated()
+            );
+
             return $this->successResponse('Factura actualizada', ['invoice' => $invoice]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -100,6 +95,7 @@ class InvoiceController extends Controller
     {
         try {
             $this->invoiceService->deleteInvoice($id);
+
             return $this->successResponse('Factura eliminada');
         } catch (\Exception $e) {
             return $this->handleException($e);

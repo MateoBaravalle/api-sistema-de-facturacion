@@ -38,8 +38,10 @@ class AuthController extends Controller
     public function login(LoginRequest $request): JsonResponse
     {
         try {
-            $data = $request->validated();
-            $token = $this->authService->login($data);
+            $token = $this->authService->login(
+                $request->validated()
+            );
+
             return $this->successResponse('Sesión iniciada', ['token' => $token]);
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -49,7 +51,10 @@ class AuthController extends Controller
     public function logout(Request $request): JsonResponse
     {
         try {
-            $this->authService->logout($request->bearerToken());
+            $this->authService->logout(
+                $request->bearerToken()
+            );
+
             return $this->successResponse('Sesión cerrada');
         } catch (\Exception $e) {
             return $this->handleException($e);
@@ -59,7 +64,10 @@ class AuthController extends Controller
     public function refresh(Request $request): JsonResponse
     {
         try {
-            $newToken = $this->authService->refresh($request->bearerToken());
+            $newToken = $this->authService->refresh(
+                $request->bearerToken()
+            );
+
             return $this->successResponse('Token actualizado', ['token' => $newToken]);
         } catch (\Exception $e) {
             return $this->handleException($e);

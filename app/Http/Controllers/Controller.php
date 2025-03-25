@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\CredentialsException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -20,7 +21,7 @@ class Controller extends BaseController
 
     protected function successResponse(
         string $message,
-        array $data = null,
+        mixed $data = null,
         int $code = 200
     ): JsonResponse {
         $response = [
@@ -74,6 +75,10 @@ class Controller extends BaseController
             $e instanceof QueryException => [
                 'message' => 'Error en base de datos',
                 'code' => 500,
+            ],
+            $e instanceof CredentialsException => [
+                'message' => 'Autenticación fallida',
+                'code' => 401,
             ],
             default => [
                 'message' => 'Operación fallida',

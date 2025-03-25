@@ -46,20 +46,20 @@ Route::group(['middleware' => 'api'], function () {
             Route::post('/client/me', [ClientController::class, 'storeProfile']); // Crear un cliente para el usuario
             Route::put('/client/me', [ClientController::class, 'updateProfile']); // Actualizar el perfil del cliente
             
-            Route::post('/order/me', [OrderController::class, 'storeMyOrder']); // Generar un pedido
-            Route::put('/order/me/{id}', [OrderController::class, 'updateMyOrder']); // Actualizar un pedido (1hs despues de creado)
+            Route::post('/order/me', [OrderController::class, 'myStore']); // Generar un pedido
+            Route::put('/order/me/{id}', [OrderController::class, 'myUpdate']); // Actualizar un pedido (1hs despues de creado)
             
-            Route::get('/order/me', [OrderController::class, 'getMyOrders']); // Seguimiento de mis pedidos
-            Route::get('/order/me/{id}', [OrderController::class, 'showMyOrder']); // Vista de un pedido, con factura y productos
+            Route::get('/order/me', [OrderController::class, 'myIndex']); // Seguimiento de mis pedidos
+            Route::get('/order/me/{id}', [OrderController::class, 'myShow']); // Vista de un pedido, con factura y productos
             
-            Route::get('/transactions/me', [TransactionController::class, 'getMyTransactions']); // Vista de las transacciones del cliente
-            Route::get('/transactions/me/{id}', [TransactionController::class, 'showMyTransaction']); // Vista de una transacción
+            Route::get('/transactions/me', [TransactionController::class, 'myIndex']); // Vista de las transacciones del cliente
+            Route::get('/transactions/me/{id}', [TransactionController::class, 'myShow']); // Vista de una transacción
             
-            Route::get('/payments/me', [PaymentController::class, 'getMyPayments']); // Vista de los pagos del cliente
-            Route::post('payments/me', [PaymentController::class, 'storeMyPayment']); // Crear un pago
+            Route::get('/payments/me', [PaymentController::class, 'myIndex']); // Vista de los pagos del cliente
+            Route::post('payments/me', [PaymentController::class, 'store']); // Crear un pago
 
-            Route::get('/invoice/me', [InvoiceController::class, 'getMyInvoices']); // Vista de las facturas del cliente
-            // Route::get('/invoice/me/{id}', [InvoiceController::class, 'showMyInvoice']); // Vista de una factura
+            Route::get('/invoice/me', [InvoiceController::class, 'myIndex']); // Vista de las facturas del cliente
+            Route::get('/invoice/me/{id}', [InvoiceController::class, 'myShow']); // Vista de una factura
             
             Route::get('notifications', [NotificationController::class, 'index']); // Get notificaciones paginadas
             
@@ -76,8 +76,8 @@ Route::group(['middleware' => 'api'], function () {
             Route::delete('/client/{id}', [ClientController::class, 'destroy']); // Eliminar un cliente
 
             // Vista de transacciones, promedio de compras y ordenes de un cliente
-            Route::get('/client/{id}/orders', [OrderController::class, 'getByClient']); // Get ordenes de un cliente con productos y facturas
-            Route::get('/client/{id}/transactions', [TransactionController::class, 'getByClient']); // Get transacciones de un cliente
+            Route::get('/client/{id}/orders', [OrderController::class, 'index']); // Get ordenes de un cliente con productos y facturas
+            Route::get('/client/{id}/transactions', [TransactionController::class, 'index']); // Get transacciones de un cliente
             Route::get('/client/{id}/purchase-average', [TransactionController::class, 'showAverage']); // Get promedio de compras de un cliente
 
             // CRUD de Ordenes
@@ -91,25 +91,25 @@ Route::group(['middleware' => 'api'], function () {
             Route::get('/transaction', [TransactionController::class, 'index']); // Get transacciones paginadas
             Route::get('/transaction/{id}', [TransactionController::class, 'show']); // Vista de una transacción
             Route::post('/transaction', [TransactionController::class, 'store']); // Crear una transacción
-            Route::get('/transaction/status', [TransactionController::class, 'getByStatus']); // Get transacciones por estado
+            Route::get('/transaction/status', [TransactionController::class, 'index']); // Get transacciones por estado
 
             // CRUD de Facturas
             Route::get('/invoice', [InvoiceController::class, 'index']); // Get facturas paginadas
             Route::get('/invoice/{id}', [InvoiceController::class, 'show']); // Vista de una factura
             Route::post('/invoice', [InvoiceController::class, 'store']); // Crear una factura
-            Route::get('/invoice/status', [InvoiceController::class, 'getByStatus']); // Get facturas por estado
+            Route::get('/invoice/status', [InvoiceController::class, 'index']); // Get facturas por estado
 
             // CRUD de Productos
-            Route::get('products', [ProductController::class, 'getAll']); // Get productos paginados
+            Route::get('products', [ProductController::class, 'index']); // Get productos paginados
             Route::post('products', [ProductController::class, 'store']); // Crear un producto
             Route::put('products/{id}', [ProductController::class, 'update']); // Actualizar un producto
             Route::delete('products/{id}', [ProductController::class, 'destroy']); // Eliminar un producto
 
             // CRUD de Listas de Precios
-            Route::get('price-list/{id}', [ProductController::class, 'getAllBySupplier']); // Vista de una lista de precios
-            Route::post('price-list', [ProductController::class, 'storeBySupplier']); // Crear una lista de precios
-            Route::put('price-list/{id}', [ProductController::class, 'updateBySupplier']); // Actualizar una lista de precios
-            Route::delete('price-list/{id}', [ProductController::class, 'destroyBySupplier']);
+            Route::get('price-list/{id}', [ProductController::class, 'index']); // Vista de una lista de precios
+            Route::post('price-list', [ProductController::class, 'store']); // Crear una lista de precios
+            Route::put('price-list/{id}', [ProductController::class, 'update']); // Actualizar una lista de precios
+            Route::delete('price-list/{id}', [ProductController::class, 'destroy']);
             
             // CRUD de Descuentos
             // Route::get('discounts', [DiscountController::class, 'index']); // Get descuentos paginados
@@ -148,7 +148,6 @@ Route::group(['middleware' => 'api'], function () {
             // Manejo de facturas
             Route::put('/invoice/{id}', [InvoiceController::class, 'update']); // Actualizar una factura
             Route::delete('/invoice/{id}', [InvoiceController::class, 'destroy']); // Eliminar una factura
-            
             
             // Vista de métricas
             // Route::get('/metrics', [MetricController::class, 'index']); // Get métricas

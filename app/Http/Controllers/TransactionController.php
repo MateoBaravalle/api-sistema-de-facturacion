@@ -33,7 +33,7 @@ class TransactionController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Transacciones recuperadas', ['transacciones' => $transactions]);
+            return $this->successResponse('Transacciones recuperadas', $transactions);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -46,7 +46,7 @@ class TransactionController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Transacciones recuperadas', ['transacciones' => $transactions]);
+            return $this->successResponse('Transacciones recuperadas', $transactions);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -57,7 +57,7 @@ class TransactionController extends Controller
         try {
             $transaction = $this->transactionService->getTransactionById($id);
 
-            return $this->successResponse('Transacción recuperada', ['transaction' => $transaction]);
+            return $this->successResponse('Transacción recuperada', $transaction);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -68,7 +68,7 @@ class TransactionController extends Controller
         try {
             $transaction = $this->transactionService->getMyTransactionById($id);
 
-            return $this->successResponse('Transacción recuperada', ['transaction' => $transaction]);
+            return $this->successResponse('Transacción recuperada', $transaction);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -79,7 +79,7 @@ class TransactionController extends Controller
         try {
             $transaction = $this->transactionService->createTransaction($request->validated());
 
-            return $this->successResponse('Transacción creada', ['transaction' => $transaction], 201);
+            return $this->successResponse('Transacción creada', $transaction, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -90,7 +90,7 @@ class TransactionController extends Controller
         try {
             $transaction = $this->transactionService->updateTransaction($id, $request->validated());
 
-            return $this->successResponse('Transacción actualizada', ['transaction' => $transaction]);
+            return $this->successResponse('Transacción actualizada', $transaction);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -112,7 +112,7 @@ class TransactionController extends Controller
         try {
             $average = $this->transactionService->getAverageTransactionAmount($clientId);
 
-            return $this->successResponse('Promedio de transacción recuperado', ['average' => $average]);
+            return $this->successResponse('Promedio de transacción recuperado', $average);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

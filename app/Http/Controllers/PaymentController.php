@@ -34,7 +34,7 @@ class PaymentController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Pagos recuperados', ['pagos' => $payments]);
+            return $this->successResponse('Pagos recuperados', $payments);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -47,7 +47,7 @@ class PaymentController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Pagos recuperados', ['pagos' => $payments]);
+            return $this->successResponse('Pagos recuperados', $payments);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -60,7 +60,7 @@ class PaymentController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Pago creado', ['pago' => $payment], 201);
+            return $this->successResponse('Pago creado', $payment, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -74,7 +74,7 @@ class PaymentController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Pago actualizado', ['pago' => $payment]);
+            return $this->successResponse('Pago actualizado', $payment);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

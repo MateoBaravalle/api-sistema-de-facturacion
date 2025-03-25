@@ -33,7 +33,7 @@ class OrderController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Ordenes recuperadas', ['orders' => $orders]);
+            return $this->successResponse('Ordenes recuperadas', $orders);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -46,7 +46,7 @@ class OrderController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Ordenes recuperadas', ['orders' => $orders]);
+            return $this->successResponse('Ordenes recuperadas', $orders);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -57,7 +57,7 @@ class OrderController extends Controller
         try {
             $order = $this->orderService->getOrderById($id);
 
-            return $this->successResponse('Orden recuperada', ['order' => $order]);
+            return $this->successResponse('Orden recuperada', $order);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -68,7 +68,7 @@ class OrderController extends Controller
         try {
             $order = $this->orderService->getMyOrderById($id);
 
-            return $this->successResponse('Orden recuperada', ['order' => $order]);
+            return $this->successResponse('Orden recuperada', $order);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -81,7 +81,7 @@ class OrderController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Orden creada', ['order' => $order], 201);
+            return $this->successResponse('Orden creada', $order, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -94,7 +94,7 @@ class OrderController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Orden creada', ['order' => $order], 201);
+            return $this->successResponse('Orden creada', $order, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -108,7 +108,7 @@ class OrderController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Orden actualizada', ['order' => $order]);
+            return $this->successResponse('Orden actualizada', $order);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -122,7 +122,7 @@ class OrderController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Orden actualizada', ['order' => $order]);
+            return $this->successResponse('Orden actualizada', $order);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -144,7 +144,7 @@ class OrderController extends Controller
         try {
             $average = $this->orderService->getAverageOrderAmount($clientId);
 
-            return $this->successResponse('Promedio de ordenes recuperado', ['average' => $average]);
+            return $this->successResponse('Promedio de ordenes recuperado', $average);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

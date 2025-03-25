@@ -27,7 +27,7 @@ class AuthController extends Controller
 
             return $this->successResponse(
                 'Registrado',
-                ['token' => $result['token']],
+                $result['token'],
                 201
             );
         } catch (\Exception $e) {
@@ -42,7 +42,7 @@ class AuthController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Sesión iniciada', ['token' => $token]);
+            return $this->successResponse('Sesión iniciada', $token);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -68,7 +68,7 @@ class AuthController extends Controller
                 $request->bearerToken()
             );
 
-            return $this->successResponse('Token actualizado', ['token' => $newToken]);
+            return $this->successResponse('Token actualizado', $newToken);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

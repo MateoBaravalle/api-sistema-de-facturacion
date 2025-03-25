@@ -35,7 +35,7 @@ class UserController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Usuarios recuperados', ['users' => $users]);
+            return $this->successResponse('Usuarios recuperados', $users);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -46,7 +46,7 @@ class UserController extends Controller
         try {
             $user = $this->userService->getUserById($id);
 
-            return $this->successResponse('Usuario recuperado', ['user' => $user]);
+            return $this->successResponse('Usuario recuperado', $user);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -59,7 +59,7 @@ class UserController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Usuario creado', ['user' => $user], 201);
+            return $this->successResponse('Usuario creado', $user, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -73,7 +73,7 @@ class UserController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Usuario actualizado', ['user' => $user]);
+            return $this->successResponse('Usuario actualizado', $user);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -92,7 +92,9 @@ class UserController extends Controller
 
     public function showProfile(): JsonResponse
     {
-        return $this->show(auth()->id());
+        return $this->show(
+            auth()->id()
+        );
     }
 
     public function updateProfile(UpdateUserRequest $request): JsonResponse

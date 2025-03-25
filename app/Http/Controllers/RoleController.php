@@ -30,7 +30,7 @@ class RoleController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Roles recuperados', ['roles' => $roles]);
+            return $this->successResponse('Roles recuperados', $roles);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -49,7 +49,7 @@ class RoleController extends Controller
 
             return $this->successResponse(
                 $assigned ? 'Role asignado' : 'Role ya asignado',
-                ['assigned' => $assigned]
+                $assigned
             );
         } catch (\Exception $e) {
             return $this->handleException($e);

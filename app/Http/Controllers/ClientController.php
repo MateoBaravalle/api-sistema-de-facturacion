@@ -40,7 +40,7 @@ class ClientController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Clientes recuperados', ['clients' => $clients]);
+            return $this->successResponse('Clientes recuperados', $clients);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -50,7 +50,7 @@ class ClientController extends Controller
     {
         try {
             $client = $this->clientService->getClientById($id);
-            return $this->successResponse('Cliente recuperado', ['client' => $client]);
+            return $this->successResponse('Cliente recuperado', $client);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -63,7 +63,7 @@ class ClientController extends Controller
                 $request->validated()
             );
             
-            return $this->successResponse('Cliente creado', ['client' => $client], 201);
+            return $this->successResponse('Cliente creado', $client, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -76,8 +76,7 @@ class ClientController extends Controller
                 $id,
                 $request->validated()
             );
-            
-            return $this->successResponse('Cliente actualizado', ['client' => $client]);
+            return $this->successResponse('Cliente actualizado', $client);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -104,7 +103,7 @@ class ClientController extends Controller
             $validated['user_id'] = auth()->user()->id;
 
             $client = $this->clientService->createClient($validated);
-            return $this->successResponse('Cliente creado', ['client' => $client], 201);
+            return $this->successResponse('Cliente creado', $client, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

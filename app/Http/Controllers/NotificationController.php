@@ -33,7 +33,7 @@ class NotificationController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Notificaciones recuperadas', ['notificaciones' => $notifications]);
+            return $this->successResponse('Notificaciones recuperadas', $notifications);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -46,7 +46,7 @@ class NotificationController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Notificación creada', ['notificación' => $notification], 201);
+            return $this->successResponse('Notificación creada', $notification, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -60,7 +60,7 @@ class NotificationController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Notificación actualizada', ['notificación' => $notification]);
+            return $this->successResponse('Notificación actualizada', $notification);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

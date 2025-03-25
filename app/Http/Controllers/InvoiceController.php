@@ -34,7 +34,7 @@ class InvoiceController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Facturas recuperadas', ['invoices' => $invoices]);
+            return $this->successResponse('Facturas recuperadas', $invoices);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -47,7 +47,7 @@ class InvoiceController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Facturas recuperadas', ['invoices' => $invoices]);
+            return $this->successResponse('Facturas recuperadas', $invoices);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -58,7 +58,7 @@ class InvoiceController extends Controller
         try {
             $invoice = $this->invoiceService->getInvoiceById($id);
 
-            return $this->successResponse('Factura recuperada', ['invoice' => $invoice]);
+            return $this->successResponse('Factura recuperada', $invoice);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -71,7 +71,7 @@ class InvoiceController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Factura creada', ['invoice' => $invoice], 201);
+            return $this->successResponse('Factura creada', $invoice, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -85,7 +85,7 @@ class InvoiceController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Factura actualizada', ['invoice' => $invoice]);
+            return $this->successResponse('Factura actualizada', $invoice);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

@@ -34,7 +34,7 @@ class ProductController extends Controller
                 $this->getQueryParams($request)
             );
 
-            return $this->successResponse('Productos recuperados', ['productos' => $products]);
+            return $this->successResponse('Productos recuperados', $products);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -47,7 +47,7 @@ class ProductController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Producto creado', ['producto' => $product], 201);
+            return $this->successResponse('Producto creado', $product, 201);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }
@@ -61,7 +61,7 @@ class ProductController extends Controller
                 $request->validated()
             );
 
-            return $this->successResponse('Producto actualizado', ['producto' => $product]);
+            return $this->successResponse('Producto actualizado', $product);
         } catch (\Exception $e) {
             return $this->handleException($e);
         }

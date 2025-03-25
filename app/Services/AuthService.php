@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\CredentialsException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 /**
@@ -35,11 +36,18 @@ class AuthService
      *
      * @param array{login: string, password: string} $credentials
      * @return string
+     * @throws CredentialsException
      */
     public function login(array $credentials): string
     {
         $credentials = $this->parseCredentials($credentials);
-        return JWTAuth::attempt($credentials);
+        $token = JWTAuth::attempt($credentials);
+        
+        if (!$token) {
+            throw new CredentialsException('El usuario o la contraseña son incorrectos');
+        }
+        
+        return $token;
     }
 
     /**
